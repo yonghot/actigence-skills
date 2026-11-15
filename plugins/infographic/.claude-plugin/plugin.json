@@ -1,0 +1,17 @@
+{
+  "name": "infographic",
+  "version": "1.0.0",
+  "description": "일반 문서의 핵심을 인쇄용 인포그래픽 HTML 한 장으로 도식화한다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "infographic",
+    "인포그래픽",
+    "도식화",
+    "html",
+    "korean"
+  ]
+}

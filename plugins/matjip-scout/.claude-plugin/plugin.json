@@ -1,0 +1,16 @@
+{
+  "name": "matjip-scout",
+  "version": "1.1.0",
+  "description": "지역과 상황에 맞는 근본 맛집만 교차검증해 .md 리포트로 낸다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "restaurant",
+    "research",
+    "korea",
+    "recommendation"
+  ]
+}

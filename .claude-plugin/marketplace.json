@@ -1,0 +1,91 @@
+{
+  "name": "actigence-skills",
+  "owner": {
+    "name": "ACTIGENCE",
+    "url": "https://github.com/yonghot"
+  },
+  "metadata": {
+    "description": "ACTIGENCE의 한국어 중심 Claude 커스텀 스킬 모음 (플러그인 마켓플레이스·수동 설치 지원)",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "gmp",
+      "source": "./plugins/gmp",
+      "description": "프롬프트와 스킬(SKILL.md)을 설계·개선하는 메타 프롬프트 프로토콜.",
+      "category": "productivity"
+    },
+    {
+      "name": "factcheck",
+      "source": "./plugins/factcheck",
+      "description": "보고서·사업계획서 등 문서를 7축으로 팩트체크하고 깨끗한 개선본을 만든다.",
+      "category": "research"
+    },
+    {
+      "name": "infographic",
+      "source": "./plugins/infographic",
+      "description": "일반 문서의 핵심을 인쇄용 인포그래픽 HTML 한 장으로 도식화한다.",
+      "category": "design"
+    },
+    {
+      "name": "gov-doc-infographic",
+      "source": "./plugins/gov-doc-infographic",
+      "description": "정부·공공 지원사업 제출 문서를 전체·개요 셀 인포그래픽 HTML로 도식화한다.",
+      "category": "design"
+    },
+    {
+      "name": "gov-startup-bizplan",
+      "source": "./plugins/gov-startup-bizplan",
+      "description": "PRD와 공고문 양식으로 정부지원사업 사업계획서 .docx를 팩트체크하며 작성한다.",
+      "category": "documents"
+    },
+    {
+      "name": "paper-quality-enhancer",
+      "source": "./plugins/paper-quality-enhancer",
+      "description": "학술 논문 원고를 투고 수준으로 끌어올리고 심사 리포트를 낸다.",
+      "category": "research"
+    },
+    {
+      "name": "session-handoff",
+      "source": "./plugins/session-handoff",
+      "description": "다음 세션이 이어받을 핸드오프 .md 한 개를 만든다.",
+      "category": "productivity"
+    },
+    {
+      "name": "matjip-scout",
+      "source": "./plugins/matjip-scout",
+      "description": "지역과 상황에 맞는 근본 맛집만 교차검증해 .md 리포트로 낸다.",
+      "category": "lifestyle"
+    },
+    {
+      "name": "business-case",
+      "source": "./plugins/business-case",
+      "description": "사업 아이템의 타당성을 보수적으로 정량 분석해 보고서를 만든다.",
+      "category": "business"
+    },
+    {
+      "name": "contract-review",
+      "source": "./plugins/contract-review",
+      "description": "서명 전 계약서를 검토해 수정 문안과 A4 1쪽 요약을 낸다.",
+      "category": "business"
+    },
+    {
+      "name": "fullstack-feature",
+      "source": "./plugins/fullstack-feature",
+      "description": "기능 1개를 데이터·API·화면·테스트 전 계층에 추가한다. 주의: 확인 질문 없이 운영 배포와 공유 DB 변경까지 자율 수행한다.",
+      "category": "development"
+    },
+    {
+      "name": "debug-rootcause",
+      "source": "./plugins/debug-rootcause",
+      "description": "근본 원인을 증거로 확인해 고치고 회귀 테스트로 봉인한다. 주의: 확인 질문 없이 운영 배포와 공유 DB 변경까지 자율 수행한다.",
+      "category": "development"
+    },
+    {
+      "name": "seo-aeo-geo",
+      "source": "./plugins/seo-aeo-geo",
+      "description": "운영 중인 사이트에 SEO·AEO·GEO 를 격리 브랜치에서 적용하고 PR 로 마감한다.",
+      "category": "development"
+    }
+  ]
+}

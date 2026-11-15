@@ -1,0 +1,18 @@
+{
+  "name": "fullstack-feature",
+  "version": "1.0.0",
+  "description": "기능 1개를 데이터·API·화면·테스트 전 계층에 추가한다. 주의: 확인 질문 없이 운영 배포와 공유 DB 변경까지 자율 수행한다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "fullstack",
+    "feature",
+    "풀스택",
+    "구현",
+    "autonomous",
+    "korean"
+  ]
+}

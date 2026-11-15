@@ -1,0 +1,17 @@
+{
+  "name": "factcheck",
+  "version": "1.1.0",
+  "description": "보고서·사업계획서 등 문서를 7축으로 팩트체크하고 깨끗한 개선본을 만든다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "fact-check",
+    "verification",
+    "report",
+    "factcheck",
+    "팩트체크"
+  ]
+}

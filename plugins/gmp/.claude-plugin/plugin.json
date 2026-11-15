@@ -1,0 +1,17 @@
+{
+  "name": "gmp",
+  "version": "2.7.0",
+  "description": "프롬프트와 스킬(SKILL.md)을 설계·개선하는 메타 프롬프트 프로토콜.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "prompt",
+    "meta-prompt",
+    "skill-authoring",
+    "gmp",
+    "프롬프트"
+  ]
+}

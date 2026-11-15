@@ -1,0 +1,18 @@
+{
+  "name": "gov-doc-infographic",
+  "version": "1.2.0",
+  "description": "정부·공공 지원사업 제출 문서를 전체·개요 셀 인포그래픽 HTML로 도식화한다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "infographic",
+    "인포그래픽",
+    "정부지원사업",
+    "사업계획서",
+    "r&d",
+    "korean"
+  ]
+}

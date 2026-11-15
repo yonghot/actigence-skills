@@ -1,0 +1,16 @@
+{
+  "name": "business-case",
+  "version": "1.1.0",
+  "description": "사업 아이템의 타당성을 보수적으로 정량 분석해 보고서를 만든다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "business-case",
+    "unit-economics",
+    "market-sizing",
+    "feasibility"
+  ]
+}

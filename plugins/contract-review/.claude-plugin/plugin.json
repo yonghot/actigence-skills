@@ -1,0 +1,17 @@
+{
+  "name": "contract-review",
+  "version": "1.0.0",
+  "description": "서명 전 계약서를 검토해 수정 문안과 A4 1쪽 요약을 낸다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "contract",
+    "review",
+    "legal",
+    "pdf",
+    "계약서"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "session-handoff",
+  "version": "1.1.0",
+  "description": "다음 세션이 이어받을 핸드오프 .md 한 개를 만든다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "handoff",
+    "session",
+    "context",
+    "continuity"
+  ]
+}

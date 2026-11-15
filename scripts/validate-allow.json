@@ -1,0 +1,14 @@
+{
+  "_doc": "Hard-coded path allow-list for validate.mjs. Each entry: file (optional path prefix, * glob allowed), match (substring of the matched text), reason (required).",
+  "allow": [
+    {
+      "match": "/mnt/user-data/outputs",
+      "reason": "Documented claude.ai output folder, used only in the S2 portability sentence (docs/PORTABILITY.md)."
+    },
+    {
+      "match": "/mnt/skills",
+      "file": "docs/",
+      "reason": "Describes the claude.ai skills mount in documentation."
+    }
+  ]
+}

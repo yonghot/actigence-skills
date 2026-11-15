@@ -1,0 +1,18 @@
+{
+  "name": "gov-startup-bizplan",
+  "version": "1.0.0",
+  "description": "PRD와 공고문 양식으로 정부지원사업 사업계획서 .docx를 팩트체크하며 작성한다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "사업계획서",
+    "정부지원사업",
+    "창업",
+    "docx",
+    "TIPS",
+    "예비창업패키지"
+  ]
+}

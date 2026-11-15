@@ -1,0 +1,17 @@
+{
+  "name": "paper-quality-enhancer",
+  "version": "1.1.0",
+  "description": "학술 논문 원고를 투고 수준으로 끌어올리고 심사 리포트를 낸다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "paper",
+    "manuscript",
+    "peer-review",
+    "academic",
+    "논문"
+  ]
+}

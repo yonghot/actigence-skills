@@ -1,0 +1,26 @@
+{
+  "_doc": "sha256 of references/prompt.md for skills coupled to an ACTIGENCE prompt card. status exact = byte-identical to the card body; ahead-of-card = repo copy is a superset not yet promoted to the card. Refresh with: node scripts/validate.mjs --update-card-hashes",
+  "skills": {
+    "fullstack-feature": {
+      "path": "plugins/fullstack-feature/skills/fullstack-feature/references/prompt.md",
+      "card": "dev-merged-4",
+      "cardVersion": "1.12",
+      "status": "exact",
+      "sha256": "4f551fd050d1372ac7f715b8123519a40af5ca661f83ea5e062e4d15d92b05c7"
+    },
+    "debug-rootcause": {
+      "path": "plugins/debug-rootcause/skills/debug-rootcause/references/prompt.md",
+      "card": "dev-merged-5",
+      "cardVersion": "1.11",
+      "status": "ahead-of-card",
+      "sha256": "8750942727b606a7c206ed8a83d985d72cce0f2c01697e45a08f730d50911b2c"
+    },
+    "seo-aeo-geo": {
+      "path": "plugins/seo-aeo-geo/skills/seo-aeo-geo/references/prompt.md",
+      "card": "setup-seo-aeo-geo",
+      "cardVersion": "1.14",
+      "status": "exact",
+      "sha256": "dba50a0588f102353a4a27183ea2b9d8501eddab849c7b0796557a37800c985c"
+    }
+  }
+}

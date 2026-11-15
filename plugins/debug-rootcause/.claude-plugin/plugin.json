@@ -1,0 +1,18 @@
+{
+  "name": "debug-rootcause",
+  "version": "1.0.0",
+  "description": "근본 원인을 증거로 확인해 고치고 회귀 테스트로 봉인한다. 주의: 확인 질문 없이 운영 배포와 공유 DB 변경까지 자율 수행한다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "debugging",
+    "디버깅",
+    "root-cause",
+    "regression",
+    "autonomous",
+    "korean"
+  ]
+}

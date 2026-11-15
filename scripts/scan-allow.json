@@ -1,0 +1,4 @@
+{
+  "_doc": "Each entry: rule (scan rule id), file (optional path prefix or * glob), match (optional substring of the matched text), reason (required).",
+  "allow": []
+}
