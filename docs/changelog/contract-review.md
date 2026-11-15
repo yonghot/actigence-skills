@@ -1,5 +1,9 @@
 # contract-review 변경 이력
 
+## 1.0.1
+
+- export-dc-pdf.mjs 보안 강화: 입력 HTML 의 script 태그·인라인 이벤트 핸들러·javascript: URL 을 두 입력 경로 모두에서 제거하고, 조립한 페이지에 스크립트를 차단하는 Content-Security-Policy 를 넣는다. Linux 의 `--no-sandbox` 는 root 로 실행할 때만 붙인다.
+
 ## 1.0.0
 
 - 최초 공개판. 비식별 처리: references/onepager.dc.html 과 SKILL.md 예시의 실제 당사자·금액·날짜·파일명을 가상 값(예시상사, 샘플기획, 12,000,000원, 2029년)으로 교체하고, 특정 PC 경로와 NOTES.md 기록 관례를 삭제. 산출 .md 는 사용자가 지정한 폴더(없으면 원본 계약서 옆, claude.ai 는 /mnt/user-data/outputs/)에 저장.

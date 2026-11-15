@@ -16,16 +16,21 @@ if (!/\.pdf$/i.test(outPdf)) {
 }
 mkdirSync(dirname(outPdf), { recursive: true });
 const links = new Set(), styles = [], pages = [];
+const strip = (h) => h
+  .replace(/<script[\s\S]*?<\/script\s*>/gi, '')
+  .replace(/<\/?script[^>]*>/gi, '')
+  .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+  .replace(/(href|src|action)\s*=\s*(["']?)\s*javascript:[^"'>\s]*/gi, '$1=$2#');
 for (const src of srcs) {
   const dc = readFileSync(src, 'utf8');
   const a = dc.indexOf('<x-dc>');
-  let body = a >= 0 ? dc.slice(a + 6, dc.indexOf('</x-dc>')) : (dc.match(/<body[^>]*>([\s\S]*)<\/body>/i) || [, dc])[1].replace(/<script[\s\S]*?<\/script>/gi, '');
+  const body = strip(a >= 0 ? dc.slice(a + 6, dc.indexOf('</x-dc>')) : (dc.match(/<body[^>]*>([\s\S]*)<\/body>/i) || [, dc])[1]);
   const helmet = (body.match(/<helmet>([\s\S]*?)<\/helmet>/) || [, ''])[1];
   for (const l of helmet.match(/<link[^>]*>/g) || []) links.add(l);
   for (const s of helmet.match(/<style>([\s\S]*?)<\/style>/g) || []) styles.push(s);
   pages.push(body.replace(/<helmet>[\s\S]*?<\/helmet>/, ''));
 }
-const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8">${[...links].join('')}
+const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="script-src 'none'; object-src 'none'; base-uri 'none'">${[...links].join('')}
 <style>@page{size:794px 1123px;margin:0}html,body{margin:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}.pg{width:794px;height:1123px;overflow:hidden;break-after:page}.pg:last-child{break-after:auto}</style>
 ${styles.join('\n')}</head><body>${pages.map((p) => `<div class="pg">${p}</div>`).join('')}</body></html>`;
 const htmlPath = outPdf.replace(/\.pdf$/i, '.html');
@@ -54,7 +59,7 @@ if (!chrome) {
 }
 const profile = mkdtempSync(join(tmpdir(), 'contract-review-pdf-'));
 const args = ['--headless=new', '--disable-gpu', `--user-data-dir=${profile}`, '--virtual-time-budget=15000', '--no-pdf-header-footer', `--print-to-pdf=${outPdf}`, pathToFileURL(htmlPath).href];
-if (process.platform === 'linux') args.unshift('--no-sandbox');
+if (process.platform === 'linux' && process.getuid?.() === 0) args.unshift('--no-sandbox');
 try {
   execFileSync(chrome, args, { stdio: 'ignore' });
 } finally {

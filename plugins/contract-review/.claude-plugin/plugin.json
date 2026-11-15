@@ -1,6 +1,6 @@
 {
   "name": "contract-review",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "서명 전 계약서를 검토해 수정 문안과 A4 1쪽 요약을 낸다.",
   "author": {
     "name": "ACTIGENCE"
