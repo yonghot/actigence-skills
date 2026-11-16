@@ -1,0 +1,16 @@
+{
+  "name": "prd-vibecoding",
+  "version": "4.3.0",
+  "description": "짧은 아이템 설명에서 oneshot-prototyping 하니스가 그대로 읽는 바이브코딩용 PRD.md 를 만든다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "prd",
+    "spec",
+    "vibe-coding",
+    "korean"
+  ]
+}

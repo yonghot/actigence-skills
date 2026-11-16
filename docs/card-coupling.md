@@ -7,8 +7,9 @@
 | fullstack-feature | dev-merged-4 | 1.12 | exact (카드와 byte-exact) |
 | debug-rootcause | dev-merged-5 | 1.11 | ahead-of-card (카드 + Recurrence 확장) |
 | seo-aeo-geo | setup-seo-aeo-geo | 1.14 | exact (카드와 byte-exact) |
+| oneshot-prototyping | setup-fullstack-prototype | 2.2 | exact (카드와 byte-exact) |
 
-oneshot-prototyping 과 prd-vibecoding 도 같은 방식으로 연동되며, 해당 자리는 별도 작업이 채운다. 대기 중인 항목은 docs/pending-slots.json 에 있다.
+prd-vibecoding 은 카드를 싣지 않는다. 다만 이 스킬이 쓰는 PRD 의 `## Ralph Loop` 섹션(10개 하위 섹션의 이름·순서·허용 값)은 oneshot-prototyping 카드의 같은 이름 절과 맞아야 하므로, 한쪽을 바꾸면 다른 쪽과 `scripts/lint-prd.mjs` 의 목록을 같은 커밋에서 맞춘다.
 
 ## 규칙
 

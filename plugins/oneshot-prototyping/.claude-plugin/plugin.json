@@ -1,0 +1,17 @@
+{
+  "name": "oneshot-prototyping",
+  "version": "2.2.0",
+  "description": "PRD 하나로 빈 폴더에서 production 배포까지 게이트 4단을 자율 반복으로 통과하는 원샷 프로토타이핑.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "prototype",
+    "prd",
+    "ralph-loop",
+    "autonomous",
+    "korean"
+  ]
+}

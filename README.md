@@ -18,12 +18,14 @@ English summary: a Korean-first collection of Claude skills by ACTIGENCE, publis
 | `session-handoff` | 세션 핸드오프 문서 | 핸드오프, 세션 이관 | 없음 | 없음 | 1.1.0 |
 | `matjip-scout` | 근본 맛집 교차검증 리포트 | 맛집 추천·선정 | 웹 검색·열람 도구 필요 | 없음 | 1.1.0 |
 | `business-case` | 사업 타당성 정량 분석 | 사업성, 시장성, CAC·LTV, 유닛 이코노믹스 | 웹 검색 권장, Python 표준 라이브러리 | 없음 | 1.1.0 |
-| `contract-review` | 서명 전 계약서 검토, A4 1쪽 요약 | 「계약서 검토」 문구 | pymupdf, python-docx, Chrome·Edge(PDF 내보내기), .hwpx 는 외부 hwpx 스킬(선택). 계약서 본문은 공개 세션에 붙여 넣지 말 것 | 없음 | 1.0.0 |
+| `contract-review` | 서명 전 계약서 검토, A4 1쪽 요약 | 「계약서 검토」 문구 | pymupdf, python-docx, Chrome·Edge(PDF 내보내기), .hwpx 는 외부 hwpx 스킬(선택). 계약서 본문은 공개 세션에 붙여 넣지 말 것 | 없음 | 1.0.1 |
 | `fullstack-feature` | 기능 1개를 전 계층에 추가 | 풀스택 + 구현 두 단어 모두 | git 저장소와 배포·DB 접근. 자율 배포 경고 참고 | dev-merged-4 v1.12 (exact) | 1.0.0 |
 | `debug-rootcause` | 근본 원인 추적·회귀 테스트 | 디버깅 단어 | git 저장소와 테스트 도구. 자율 배포 경고 참고 | dev-merged-5 v1.11 (ahead-of-card) | 1.0.0 |
 | `seo-aeo-geo` | 운영 사이트 SEO·AEO·GEO 적용, PR 마감 | SEO 단어 | git 저장소, 빌드 가능한 사이트 | setup-seo-aeo-geo v1.14 (exact) | 1.0.0 |
+| `oneshot-prototyping` | PRD 하나로 빈 폴더에서 production 배포까지(게이트 4단 자율 반복) | 「프로토타이핑」 단어 + PRD 첨부(또는 폴더에 PRD 파일) | git·Node, 배포 CLI(예: vercel), gcloud 선택(구글 시트 프로비저닝), playwright 선택(실측 디자인 게이트), 이미지 도구 선택. 자율 배포 경고 참고 | setup-fullstack-prototype v2.2 (exact) | 2.2.0 |
+| `prd-vibecoding` | 아이템 설명에서 바이브코딩용 PRD.md 작성 | PRD 만들어줘·작성해줘, 바이브코딩 PRD·사양서, write a PRD | Node 선택(PRD 린터) | 없음 | 4.3.0 |
 
-준비 중인 스킬 `oneshot-prototyping`, `prd-vibecoding` 은 아직 설치할 수 없으며 목록은 `docs/pending-slots.json` 에 있습니다.
+`prd-vibecoding` 으로 PRD 를 만들고 `oneshot-prototyping` 으로 그 PRD 를 배포까지 끌고 가는 한 쌍입니다(PRD 의 `## Ralph Loop` 섹션이 둘 사이의 계약).
 
 짝 스킬: `infographic` ↔ `gov-doc-infographic`, `factcheck` ↔ `paper-quality-enhancer`, `gov-startup-bizplan` ↔ `business-case`. 서로의 제외 대상이므로 둘 다 설치해 두면 요청에 맞는 쪽만 반응합니다. 문서 종류가 불분명한 사업계획서 인포그래픽 요청은 제출용인지 먼저 확인하세요. `session-handoff` 는 다른 세션으로 작업을 넘길 때 쓰며 PROGRESS.md 갱신이나 다른 핸드오프·컨텍스트 저장 스킬(handoff-doc, context-save)을 대체하지 않습니다. 같은 요청에 여러 개가 반응하면 쓰지 않을 쪽을 끄세요.
 <!-- skills-table:end -->
@@ -61,6 +63,8 @@ English summary: a Korean-first collection of Claude skills by ACTIGENCE, publis
 - 파일 접근이 가능한 에이전트 환경(작업 폴더에 파일 저장)이 필요한 스킬이 있습니다. 규칙은 [docs/PORTABILITY.md](docs/PORTABILITY.md) 에 있습니다.
 
 ## 경고: 자율 배포
+
+`oneshot-prototyping` 은 확인 질문 없이 production 배포까지 가고, gcloud 에 로그인돼 있으면 GCP 프로젝트·서비스 계정·구글 시트를 만들어 연결합니다. 배포를 원하지 않으면 PRD 의 `## Ralph Loop` → `### 자율성 강도` 에서 production 배포 모드를 `DRY-RUN` 으로, 시트를 원하지 않으면 `### 데이터 저장소` 의 저장소를 `file` 또는 `none` 으로 적으세요.
 
 `fullstack-feature` 와 `debug-rootcause` 는 사용자의 요청 범위 안에서 프로덕션 배포와 공유 DB 마이그레이션까지 자율로 수행하도록 설계된 스킬입니다. 이런 일을 원하지 않으면 요청에 "배포하지 말 것", "공유·운영 DB 는 건드리지 말 것" 이라고 명시하세요. 두 스킬은 그 경우 해당 단계를 건너뜁니다. 처음 쓸 때는 테스트 저장소에서 시험해 보기를 권합니다.
 

@@ -21,6 +21,13 @@
       "cardVersion": "1.14",
       "status": "exact",
       "sha256": "dba50a0588f102353a4a27183ea2b9d8501eddab849c7b0796557a37800c985c"
+    },
+    "oneshot-prototyping": {
+      "path": "plugins/oneshot-prototyping/skills/oneshot-prototyping/references/prompt.md",
+      "card": "setup-fullstack-prototype",
+      "cardVersion": "2.2",
+      "status": "exact",
+      "sha256": "494f079b688debb538105bc626cd0b38a2a48f97766ea63a2f310957f8a29733"
     }
   }
 }

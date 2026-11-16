@@ -86,6 +86,18 @@
       "source": "./plugins/seo-aeo-geo",
       "description": "운영 중인 사이트에 SEO·AEO·GEO 를 격리 브랜치에서 적용하고 PR 로 마감한다.",
       "category": "development"
+    },
+    {
+      "name": "oneshot-prototyping",
+      "source": "./plugins/oneshot-prototyping",
+      "description": "PRD 하나로 빈 폴더에서 production 배포까지 게이트 4단을 자율 반복으로 통과한다. 주의: 확인 질문 없이 production 배포와 GCP·구글 시트 프로비저닝까지 자율 수행한다.",
+      "category": "development"
+    },
+    {
+      "name": "prd-vibecoding",
+      "source": "./plugins/prd-vibecoding",
+      "description": "짧은 아이템 설명에서 oneshot-prototyping 하니스가 그대로 읽는 바이브코딩용 PRD.md 를 만든다.",
+      "category": "development"
     }
   ]
 }
