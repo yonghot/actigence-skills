@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, mkdtempSync, rmSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, dirname, resolve } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
@@ -57,13 +57,20 @@ if (!chrome) {
   console.log('NO_BROWSER: no Chrome/Edge/Chromium found (set CHROME to a browser executable). html only ->', htmlPath);
   process.exit(3);
 }
+// Sweep profiles a previous run could not delete (Windows file locks); they leaked tens of MB each.
+for (const d of readdirSync(tmpdir())) {
+  if (!d.startsWith('contract-review-pdf-')) continue;
+  const p = join(tmpdir(), d);
+  try { if (Date.now() - statSync(p).mtimeMs > 600000) rmSync(p, { recursive: true, force: true }); } catch {}
+}
 const profile = mkdtempSync(join(tmpdir(), 'contract-review-pdf-'));
 const args = ['--headless=new', '--disable-gpu', `--user-data-dir=${profile}`, '--virtual-time-budget=15000', '--no-pdf-header-footer', `--print-to-pdf=${outPdf}`, pathToFileURL(htmlPath).href];
 if (process.platform === 'linux' && process.getuid?.() === 0) args.unshift('--no-sandbox');
 try {
   execFileSync(chrome, args, { stdio: 'ignore' });
 } finally {
-  rmSync(profile, { recursive: true, force: true });
+  // Windows: Chrome children may still hold the profile right after exit -> EPERM/EBUSY; retry, never fail the export.
+  try { rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 }); } catch {}
 }
 const pdf = readFileSync(outPdf).toString('latin1');
 console.log('browser', chrome);

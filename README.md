@@ -18,7 +18,7 @@ English summary: a Korean-first collection of Claude skills by ACTIGENCE, publis
 | `session-handoff` | 세션 핸드오프 문서 | 핸드오프, 세션 이관 | 없음 | 없음 | 1.1.0 |
 | `matjip-scout` | 근본 맛집 교차검증 리포트 | 맛집 추천·선정 | 웹 검색·열람 도구 필요 | 없음 | 1.1.0 |
 | `business-case` | 사업 타당성 정량 분석 | 사업성, 시장성, CAC·LTV, 유닛 이코노믹스 | 웹 검색 권장, Python 표준 라이브러리 | 없음 | 1.1.0 |
-| `contract-review` | 서명 전 계약서 검토, A4 1쪽 요약 | 「계약서 검토」 문구 | pymupdf, python-docx, Chrome·Edge(PDF 내보내기), .hwpx 는 외부 hwpx 스킬(선택). 계약서 본문은 공개 세션에 붙여 넣지 말 것 | 없음 | 1.0.1 |
+| `contract-review` | 서명 전 계약서 검토, A4 1쪽 요약 | 「계약서 검토」 문구 | pymupdf, python-docx, Chrome·Edge(PDF 내보내기), .hwpx 는 외부 hwpx 스킬(선택). 계약서 본문은 공개 세션에 붙여 넣지 말 것 | 없음 | 1.0.2 |
 | `fullstack-feature` | 기능 1개를 전 계층에 추가 | 풀스택 + 구현 두 단어 모두 | git 저장소와 배포·DB 접근. 자율 배포 경고 참고 | dev-merged-4 v1.12 (exact) | 1.0.0 |
 | `debug-rootcause` | 근본 원인 추적·회귀 테스트 | 디버깅 단어 | git 저장소와 테스트 도구. 자율 배포 경고 참고 | dev-merged-5 v1.11 (ahead-of-card) | 1.0.0 |
 | `seo-aeo-geo` | 운영 사이트 SEO·AEO·GEO 적용, PR 마감 | SEO 단어 | git 저장소, 빌드 가능한 사이트 | setup-seo-aeo-geo v1.14 (exact) | 1.0.0 |
