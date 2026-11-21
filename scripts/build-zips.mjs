@@ -7,6 +7,7 @@ import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 import { Report, validateSkillDir, walk, parseFrontmatter, loadAllow } from "./validate.mjs";
+import { PLUGIN as PROMPTS_PLUGIN } from "./sync-prompts.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DOS_TIME = 0;
@@ -132,6 +133,20 @@ for (const pl of plugins) {
   const sdir = path.join(pluginsDir, pl, "skills");
   if (!fs.existsSync(pj) || !fs.existsSync(sdir)) { console.log(`skip ${pl}: incomplete plugin`); continue; }
   const version = JSON.parse(fs.readFileSync(pj, "utf8").replace(/^﻿/, "")).version;
+  if (pl === PROMPTS_PLUGIN) {
+    if (only && !only.includes(pl)) continue;
+    const top = "actigence-prompt-cards";
+    const files = fs.readdirSync(sdir).filter((id) => fs.existsSync(path.join(sdir, id, "references", "prompt.md")))
+      .map((id) => ({ name: `${top}/${id}.md`, data: fs.readFileSync(path.join(sdir, id, "references", "prompt.md")) }));
+    files.push({ name: `${top}/index.json`, data: fs.readFileSync(path.join(ROOT, "prompts", "index.json")) });
+    const file = path.join(outDir, `${top}-${version}.zip`);
+    fs.writeFileSync(file, buildZip(files));
+    built++;
+    const bad = verify ? readZip(fs.readFileSync(file)).filter((e) => !e.name.startsWith(`${top}/`) || e.name.includes("\\")) : [];
+    if (bad.length) { failed++; console.error(`FAIL ${path.basename(file)}: bad entries ${bad.map((e) => e.name).join(", ")}`); }
+    else console.log(`ok   ${path.basename(file)} (${fs.statSync(file).size} bytes, ${files.length - 1} cards; command-style skills are not built as claude.ai skill zips)`);
+    continue;
+  }
   for (const skill of fs.readdirSync(sdir)) {
     if (only && !only.includes(skill)) continue;
     const skillDir = path.join(sdir, skill);
