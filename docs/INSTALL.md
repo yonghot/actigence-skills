@@ -1,6 +1,28 @@
 # 설치 안내
 
-세 가지 경로가 있습니다. 같은 스킬을 두 경로로 중복 설치하지 마세요(README 의 "중복 트리거와 백업" 참고).
+세 가지 경로가 있습니다. 같은 스킬을 두 경로로 중복 설치하지 마세요(README 의 "중복 트리거와 백업" 참고). 늘 최신판을 쓰려면 1번 경로에서 자동 업데이트를 켜야 합니다. zip 업로드와 수동 복사는 새 판이 나와도 저절로 바뀌지 않습니다.
+
+## 0. 한 번에 설정 (권장)
+
+```powershell
+# Windows PowerShell 5.1 / 7
+irm https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.ps1 | iex
+# 일부만: & ([scriptblock]::Create((irm https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.ps1))) -Skills gmp,factcheck
+```
+
+```bash
+# macOS, Linux, Git Bash
+curl -fsSL https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.sh | bash
+# 일부만: curl -fsSL https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.sh | bash -s -- --skills gmp,factcheck
+```
+
+하는 일:
+
+1. 같은 이름의 개인 복사본(`~/.claude/skills/<이름>`)을 `~/.claude/skill-backups/<이름>-<시각>/` 으로 옮깁니다(`-KeepPersonalCopies` / `--keep-personal-copies` 로 끔). claude.ai 에서 동기화된 사본(`skills/synced/<이름>`)이 있으면 경고만 합니다.
+2. `claude` 명령이 있으면 마켓플레이스를 추가하고 설치되지 않은 플러그인을 설치합니다. 없으면 다음 세션 시작 때 Claude Code 가 설정을 보고 내려받습니다.
+3. `~/.claude/settings.json`(또는 `CLAUDE_CONFIG_DIR`)에 `extraKnownMarketplaces.actigence-skills` 를 `autoUpdate: true` 로 넣고 플러그인을 `enabledPlugins` 에 켭니다. 전에 직접 끈 플러그인은 그대로 둡니다. 원래 파일은 `settings.json.backup-<시각>` 으로 남깁니다.
+
+자동 업데이트는 대화형 세션에서 첫 메시지를 보낸 뒤 최대 10분 안에 돌고, 받은 새 판은 다음 실행(또는 `/reload-plugins`)부터 적용됩니다. `DISABLE_AUTOUPDATER`·`DISABLE_UPDATES`·`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 를 켠 환경에서는 돌지 않습니다(`FORCE_AUTOUPDATE_PLUGINS=1` 로 되살림). 저장소에 새 플러그인이 추가되면 스크립트를 한 번 더 실행해야 켜집니다. 새 프롬프트 카드는 `actigence-prompts` 안에 들어오므로 다시 실행할 필요가 없습니다.
 
 ## 1. Claude Code 플러그인 마켓플레이스
 
@@ -11,7 +33,7 @@ claude plugin marketplace add yonghot/actigence-skills
 claude plugin install gmp@actigence-skills
 ```
 
-저장소 약칭(`yonghot/actigence-skills`)으로 추가하는 경로와 claude.ai zip 업로드는 첫 공개 뒤에 시험하기 전까지 확인되지 않았습니다. 로컬 폴더 경로로 추가하는 방식만 확인했습니다.
+저장소 약칭(`yonghot/actigence-skills`)으로 추가·설치하는 경로는 2026-11-16 에 확인했습니다. claude.ai zip 업로드는 아직 시험하지 않았습니다.
 
 모든 사용자에게 적용되는 것이 기본(`--scope user`)입니다. 팀 저장소에만 적용하려면 `--scope project` 를 붙입니다.
 
@@ -32,7 +54,7 @@ claude plugin marketplace update actigence-skills
 claude plugin update gmp@actigence-skills
 ```
 
-플러그인별 토큰 비용은 `claude plugin details gmp@actigence-skills` 로 볼 수 있습니다. 제3자 마켓플레이스는 자동 업데이트가 기본으로 꺼져 있으니 `/plugin` 에서 켜거나 위 명령을 직접 실행하세요.
+플러그인별 토큰 비용은 `claude plugin details gmp@actigence-skills` 로 볼 수 있습니다. 제3자 마켓플레이스는 자동 업데이트가 기본으로 꺼져 있으니 0번 스크립트를 쓰거나 `/plugin` 에서 켜세요.
 
 저장소 개발자는 `claude plugin validate <저장소 경로>` 로 마켓플레이스 형식을 확인할 수 있습니다.
 

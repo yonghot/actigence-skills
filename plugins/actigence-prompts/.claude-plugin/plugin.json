@@ -1,0 +1,16 @@
+{
+  "name": "actigence-prompts",
+  "version": "1.0.0",
+  "description": "ACTIGENCE 프롬프트 카드 전체를 /actigence-prompts:<카드 id> 로 불러 쓴다. 사이트의 카드가 바뀌면 자동으로 따라간다.",
+  "author": {
+    "name": "ACTIGENCE"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/yonghot/actigence-skills",
+  "keywords": [
+    "prompt",
+    "prompt-card",
+    "vibe-coding",
+    "korean"
+  ]
+}

@@ -1,8 +1,32 @@
 # actigence-skills
 
-ACTIGENCE 의 한국어 중심 Claude 커스텀 스킬 모음입니다. Claude Code 플러그인 마켓플레이스, claude.ai·데스크톱 앱 zip 업로드, 수동 복사 세 가지 방법으로 어떤 PC·어떤 Claude 계정에서든 설치할 수 있습니다. 라이선스는 MIT 입니다.
+ACTIGENCE 의 한국어 중심 Claude 커스텀 스킬 모음과 프롬프트 카드 전체입니다. Claude Code 플러그인 마켓플레이스로 설치하면 어떤 PC·어떤 계정에서든 최신판을 자동으로 받습니다. claude.ai·데스크톱 앱 zip 업로드와 수동 복사도 됩니다. 라이선스는 MIT 입니다.
 
-English summary: a Korean-first collection of Claude skills by ACTIGENCE, published as a Claude Code plugin marketplace (one plugin per skill), per-skill zips for claude.ai and the desktop app, and manual install scripts. MIT licensed. See [docs/INSTALL.md](docs/INSTALL.md).
+English summary: a Korean-first collection of Claude skills and all ACTIGENCE prompt cards, published as a Claude Code plugin marketplace (one plugin per skill, plus `actigence-prompts` for the cards) with auto-update, per-skill zips for claude.ai and the desktop app, and manual install scripts. Prompt cards are pulled from actigence.ai every 3 hours by a GitHub Action. MIT licensed. See [docs/INSTALL.md](docs/INSTALL.md).
+
+## 빠른 시작 (어느 PC 든 한 번)
+
+Windows PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.ps1 | iex
+```
+
+macOS·Linux·Git Bash:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.sh | bash
+```
+
+이 스크립트는 마켓플레이스를 추가하고 자동 업데이트를 켠 뒤(`extraKnownMarketplaces.actigence-skills.autoUpdate`) 모든 플러그인을 설치·활성화합니다. 같은 이름의 개인 복사본(`~/.claude/skills/<이름>`)은 두 번 로드되지 않게 `~/.claude/skill-backups/` 로 옮깁니다. 그 뒤로는 Claude Code 세션에서 첫 메시지를 보내면 새 판을 자동으로 받고, 다음 실행부터 적용됩니다. 일부만 원하면 `-Skills gmp,factcheck`(PowerShell) 또는 `--skills gmp,factcheck`(bash) 를 붙입니다.
+
+## 프롬프트 카드
+
+ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.md) 에 있습니다. GitHub Actions(`sync-prompts`)가 3시간마다 사이트에서 카드를 받아 오고, 바뀐 카드가 있으면 버전을 올려 커밋합니다. 그래서 자동 업데이트를 켠 PC 는 늘 사이트와 같은 카드를 씁니다.
+
+- Claude Code: `actigence-prompts` 플러그인의 `/actigence-prompts:<카드 id> 작업 요청`. 목록은 `/actigence-prompts:actigence-prompts`. 자동으로 발동하지 않고 명령으로만 씁니다.
+- 그 밖의 도구·계정: [prompts/README.md](prompts/README.md) 표의 "원문" 링크(항상 최신판)를 복사해 붙여 넣습니다.
+- 카드와 짝인 스킬(`oneshot-prototyping`, `fullstack-feature`, `seo-aeo-geo`)의 `references/prompt.md` 도 같은 동기화가 맞춥니다. `debug-rootcause` 는 카드보다 앞선 판이라 카드가 바뀌면 이슈로 알리고 손으로 합칩니다.
 
 ## 스킬 목록
 
@@ -24,6 +48,7 @@ English summary: a Korean-first collection of Claude skills by ACTIGENCE, publis
 | `seo-aeo-geo` | 운영 사이트 SEO·AEO·GEO 적용, PR 마감 | SEO 단어 | git 저장소, 빌드 가능한 사이트 | setup-seo-aeo-geo v1.14 (exact) | 1.0.0 |
 | `oneshot-prototyping` | PRD 하나로 빈 폴더에서 production 배포까지(게이트 4단 자율 반복) | 「프로토타이핑」 단어 + PRD 첨부(또는 폴더에 PRD 파일) | git·Node, 배포 CLI(예: vercel), gcloud 선택(구글 시트 프로비저닝), playwright 선택(실측 디자인 게이트), 이미지 도구 선택. 자율 배포 경고 참고 | setup-fullstack-prototype v2.2 (exact) | 2.2.0 |
 | `prd-vibecoding` | 아이템 설명에서 바이브코딩용 PRD.md 작성 | PRD 만들어줘·작성해줘, 바이브코딩 PRD·사양서, write a PRD | Node 선택(PRD 린터) | 없음 | 4.3.0 |
+| `actigence-prompts` | 프롬프트 카드 전체를 명령으로 실행 | 자동 발동 없음 — `/actigence-prompts:<카드 id>` | 카드마다 다름(각 카드 본문 참고) | 사이트 카드 전체(자동 동기화) | 1.0.0 |
 
 `prd-vibecoding` 으로 PRD 를 만들고 `oneshot-prototyping` 으로 그 PRD 를 배포까지 끌고 가는 한 쌍입니다(PRD 의 `## Ralph Loop` 섹션이 둘 사이의 계약).
 
@@ -34,12 +59,14 @@ English summary: a Korean-first collection of Claude skills by ACTIGENCE, publis
 
 자세한 절차는 [docs/INSTALL.md](docs/INSTALL.md) 에 있습니다.
 
-1. Claude Code 플러그인 마켓플레이스 (권장)
+1. Claude Code 플러그인 마켓플레이스 (권장): 위 "빠른 시작" 스크립트가 아래 과정을 대신 하고 자동 업데이트까지 켭니다. 직접 하려면
 
    ```
    claude plugin marketplace add yonghot/actigence-skills
    claude plugin install <스킬이름>@actigence-skills
    ```
+
+   그다음 `/plugin` → Marketplaces → `actigence-skills` 에서 자동 업데이트를 켭니다(제3자 마켓플레이스는 기본이 꺼짐).
 
 2. claude.ai·데스크톱 앱: [Releases](https://github.com/yonghot/actigence-skills/releases) 에서 스킬별 zip(`<스킬이름>-<버전>.zip`)을 받아 Customize > Skills 에서 업로드합니다. 마켓플레이스 추가 화면으로 설치하는 경로와 GitHub 저장소 약칭(`yonghot/actigence-skills`)으로 추가하는 경로, claude.ai zip 업로드는 공개 후 시험 전이라 확인되지 않았습니다.
 

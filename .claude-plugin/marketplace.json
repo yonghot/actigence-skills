@@ -98,6 +98,12 @@
       "source": "./plugins/prd-vibecoding",
       "description": "짧은 아이템 설명에서 oneshot-prototyping 하니스가 그대로 읽는 바이브코딩용 PRD.md 를 만든다.",
       "category": "development"
+    },
+    {
+      "name": "actigence-prompts",
+      "source": "./plugins/actigence-prompts",
+      "description": "ACTIGENCE 프롬프트 카드 전체를 /actigence-prompts:<카드 id> 로 불러 쓴다. 사이트의 카드가 바뀌면 자동으로 따라간다. 자동으로 발동하지 않고 명령으로만 쓴다.",
+      "category": "productivity"
     }
   ]
 }
