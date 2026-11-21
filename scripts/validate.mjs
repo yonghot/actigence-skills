@@ -186,6 +186,7 @@ export function validateSkillDir(skillDir, ctx) {
   for (const re of [/data\/prompts\.json/, /actigence-next/i, /Actigence[\\/]/, /actigence\.ai\/vibe-coding-prompts/i, /로컬 분기/]) {
     if (re.test(src)) report.error(w, `site-internal reference must not appear in SKILL.md: ${re}`);
   }
+  if (src.includes("!`")) report.error(w, "shell placeholder !` is not allowed in SKILL.md (Claude Code runs it when the skill is invoked)");
 
   for (const f of walk(skillDir)) {
     const fr = rel(root, f);

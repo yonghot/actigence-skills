@@ -12,7 +12,8 @@
       "path": "plugins/actigence-prompts/skills/setup-fullstack-prototype/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/setup-fullstack-prototype/references/prompt.md",
       "skill": "oneshot-prototyping",
-      "sha256": "494f079b688debb538105bc626cd0b38a2a48f97766ea63a2f310957f8a29733"
+      "sha256": "494f079b688debb538105bc626cd0b38a2a48f97766ea63a2f310957f8a29733",
+      "bytes": 168090
     },
     {
       "id": "setup-seo-aeo-geo",
@@ -25,7 +26,8 @@
       "path": "plugins/actigence-prompts/skills/setup-seo-aeo-geo/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/setup-seo-aeo-geo/references/prompt.md",
       "skill": "seo-aeo-geo",
-      "sha256": "dba50a0588f102353a4a27183ea2b9d8501eddab849c7b0796557a37800c985c"
+      "sha256": "dba50a0588f102353a4a27183ea2b9d8501eddab849c7b0796557a37800c985c",
+      "bytes": 76172
     },
     {
       "id": "dev-merged-3",
@@ -38,7 +40,8 @@
       "path": "plugins/actigence-prompts/skills/dev-merged-3/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-merged-3/references/prompt.md",
       "skill": null,
-      "sha256": "0922bba1822e9702dc66d406d6fbc0963ed41e36bb06f18cb56c0c59b36a9a7c"
+      "sha256": "0922bba1822e9702dc66d406d6fbc0963ed41e36bb06f18cb56c0c59b36a9a7c",
+      "bytes": 45870
     },
     {
       "id": "dev-merged-4",
@@ -51,7 +54,8 @@
       "path": "plugins/actigence-prompts/skills/dev-merged-4/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-merged-4/references/prompt.md",
       "skill": "fullstack-feature",
-      "sha256": "4f551fd050d1372ac7f715b8123519a40af5ca661f83ea5e062e4d15d92b05c7"
+      "sha256": "4f551fd050d1372ac7f715b8123519a40af5ca661f83ea5e062e4d15d92b05c7",
+      "bytes": 46202
     },
     {
       "id": "dev-6",
@@ -64,7 +68,8 @@
       "path": "plugins/actigence-prompts/skills/dev-6/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-6/references/prompt.md",
       "skill": null,
-      "sha256": "201dce8ab24c82940eacd35d653394a93ac1e3378464682c2b8a90ca052ed3db"
+      "sha256": "201dce8ab24c82940eacd35d653394a93ac1e3378464682c2b8a90ca052ed3db",
+      "bytes": 48839
     },
     {
       "id": "dev-merged-5",
@@ -77,7 +82,8 @@
       "path": "plugins/actigence-prompts/skills/dev-merged-5/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-merged-5/references/prompt.md",
       "skill": "debug-rootcause",
-      "sha256": "95667fcf72764ebad2b546e12045c357534a00b9b2306132c72906c67e7bd88f"
+      "sha256": "95667fcf72764ebad2b546e12045c357534a00b9b2306132c72906c67e7bd88f",
+      "bytes": 46331
     },
     {
       "id": "dev-quality-pipeline",
@@ -90,7 +96,8 @@
       "path": "plugins/actigence-prompts/skills/dev-quality-pipeline/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-quality-pipeline/references/prompt.md",
       "skill": null,
-      "sha256": "3e2afe3e83350898a3c19fdb651a03d90323faac730c3ce054069a047a12bea0"
+      "sha256": "3e2afe3e83350898a3c19fdb651a03d90323faac730c3ce054069a047a12bea0",
+      "bytes": 49592
     },
     {
       "id": "dev-tracking-vercel-ga4",
@@ -103,7 +110,8 @@
       "path": "plugins/actigence-prompts/skills/dev-tracking-vercel-ga4/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-tracking-vercel-ga4/references/prompt.md",
       "skill": null,
-      "sha256": "6135ebb11165e3a8fd28cb635c75b0d5615c79a07dc63ce1ef379a5f6fb076f1"
+      "sha256": "6135ebb11165e3a8fd28cb635c75b0d5615c79a07dc63ce1ef379a5f6fb076f1",
+      "bytes": 78146
     },
     {
       "id": "dev-13",
@@ -116,7 +124,8 @@
       "path": "plugins/actigence-prompts/skills/dev-13/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-13/references/prompt.md",
       "skill": null,
-      "sha256": "63dc731c9ba301c7e4ceb05505a5c7a404c8230612700c01075d92fbe867a267"
+      "sha256": "63dc731c9ba301c7e4ceb05505a5c7a404c8230612700c01075d92fbe867a267",
+      "bytes": 46695
     },
     {
       "id": "dev-14",
@@ -129,7 +138,8 @@
       "path": "plugins/actigence-prompts/skills/dev-14/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-14/references/prompt.md",
       "skill": null,
-      "sha256": "256f0336296fe130413e42c7076ec4b6bf4a11391646326810c1eda3dc9a7bdc"
+      "sha256": "256f0336296fe130413e42c7076ec4b6bf4a11391646326810c1eda3dc9a7bdc",
+      "bytes": 47575
     },
     {
       "id": "dev-design-overhaul",
@@ -142,7 +152,8 @@
       "path": "plugins/actigence-prompts/skills/dev-design-overhaul/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-design-overhaul/references/prompt.md",
       "skill": null,
-      "sha256": "15971d1d68bb5edf2b6c91c5c96f72c2bff8124deeb10c6dd34307ebe67f46ac"
+      "sha256": "15971d1d68bb5edf2b6c91c5c96f72c2bff8124deeb10c6dd34307ebe67f46ac",
+      "bytes": 60471
     },
     {
       "id": "dev-slides-html",
@@ -155,7 +166,8 @@
       "path": "plugins/actigence-prompts/skills/dev-slides-html/references/prompt.md",
       "rawUrl": "https://raw.githubusercontent.com/yonghot/actigence-skills/main/plugins/actigence-prompts/skills/dev-slides-html/references/prompt.md",
       "skill": null,
-      "sha256": "549b96435d7c45f98c5942af93bb07c835bf8bf22ed4b2d910e99c40acd3495d"
+      "sha256": "549b96435d7c45f98c5942af93bb07c835bf8bf22ed4b2d910e99c40acd3495d",
+      "bytes": 70327
     }
   ]
 }

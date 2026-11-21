@@ -47,6 +47,15 @@ foreach ($n in $names) {
   if (Test-Path (Join-Path $skillsDir "synced\$n")) { Say "WARNING: $n is also synced from claude.ai (skills\synced\$n). Disable or delete that upload on claude.ai so it does not load twice." }
 }
 
+$offBefore = @()
+if (Test-Path $SettingsPath) {
+  $pre = [IO.File]::ReadAllText($SettingsPath)
+  if ($pre.Trim()) {
+    $preObj = FromJson $pre
+    if ($preObj.enabledPlugins) { $offBefore = @($preObj.enabledPlugins.PSObject.Properties | Where-Object { $_.Value -eq $false } | ForEach-Object { $_.Name }) }
+  }
+}
+
 $claude = Get-Command claude -ErrorAction SilentlyContinue
 if ($claude -and -not $DryRun) {
   $env:CLAUDE_CODE_PLUGIN_PREFER_HTTPS = '1'
@@ -56,7 +65,7 @@ if ($claude -and -not $DryRun) {
   $installed = @()
   if (Test-Path $installedFile) { $installed = @((FromJson ([IO.File]::ReadAllText($installedFile))).plugins.PSObject.Properties.Name) }
   foreach ($n in $names) {
-    if ($installed -contains "$n@$Market") { continue }
+    if ($installed -contains "$n@$Market" -or $offBefore -contains "$n@$Market") { continue }
     $out = & claude plugin install "$n@$Market" 2>&1 | Select-Object -Last 1
     Say "install $n@${Market}: $out"
   }
@@ -76,6 +85,7 @@ $markets | Add-Member -Force -NotePropertyName $Market -NotePropertyValue $entry
 $enabled = EnsureObj $s 'enabledPlugins'
 foreach ($n in $names) {
   $key = "$n@$Market"
+  if ($offBefore -contains $key) { $enabled | Add-Member -Force -NotePropertyName $key -NotePropertyValue $false }
   if ($enabled.PSObject.Properties.Name -contains $key) {
     if ($enabled.$key -eq $false) { Say "kept $key disabled (you turned it off before)" }
     continue

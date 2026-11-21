@@ -55,19 +55,26 @@ jobs:
         run: |
           set -o pipefail
           { node scripts/validate.mjs && node scripts/scan.mjs && node scripts/build-zips.mjs --out "$RUNNER_TEMP/dist"; } 2>&1 | tee "$RUNNER_TEMP/check.txt"
+      - name: Decide whether the change can go straight to main
+        id: gate
+        if: steps.sync.outputs.changed == '1'
+        run: |
+          node -e 'const r=require(process.env.RUNNER_TEMP+"/sync.json");for(const a of r.review)console.log(a)' > "$RUNNER_TEMP/review.txt"
+          if [ -s "$RUNNER_TEMP/review.txt" ]; then echo "direct=0" >> "$GITHUB_OUTPUT"; cat "$RUNNER_TEMP/review.txt"; else echo "direct=1" >> "$GITHUB_OUTPUT"; fi
       - name: Commit to main
-        if: steps.sync.outputs.changed == '1' && steps.check.outcome == 'success'
+        if: steps.sync.outputs.changed == '1' && steps.check.outcome == 'success' && steps.gate.outputs.direct == '1'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "sync: prompt cards from actigence.ai ($(node -e 'const r=require(process.env.RUNNER_TEMP+"/sync.json");console.log([...r.added.map(i=>"+"+i),...r.removed.map(i=>"-"+i),...r.changed].join(", ")||"metadata")'))"
           git push origin HEAD:main
-      - name: Open a pull request instead (validation failed)
-        if: steps.sync.outputs.changed == '1' && steps.check.outcome != 'success'
+      - name: Open a pull request instead (validation failed or unusual change)
+        if: steps.sync.outputs.changed == '1' && (steps.check.outcome != 'success' || steps.gate.outputs.direct != '1')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if gh pr list --state open --search "head:sync/prompts-" --json number --jq '.[0].number' | grep -q .; then echo "a sync PR is already open; not opening another"; exit 1; fi
           branch="sync/prompts-${GITHUB_RUN_ID}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -75,5 +82,5 @@ jobs:
           git add -A
           git commit -m "sync: prompt cards from actigence.ai (needs review)"
           git push origin "$branch"
-          gh pr create --base main --head "$branch" --title "sync: prompt cards from actigence.ai (validation failed)" --body "$(printf 'Automatic sync changed files but validation failed, so nothing was pushed to main.\n\n```\n'; tail -n 60 "$RUNNER_TEMP/check.txt"; printf '\n```\n')"
+          gh pr create --base main --head "$branch" --title "sync: prompt cards from actigence.ai (needs review)" --body "$(printf 'Automatic sync changed files but did not push to main.\n\nUnusual changes (deleted cards, many cards at once, a card that shrank by half):\n\n'; sed 's/^/- /' "$RUNNER_TEMP/review.txt"; printf '\n\nValidation output (tail):\n\n```\n'; tail -n 60 "$RUNNER_TEMP/check.txt" 2>/dev/null; printf '\n```\n')"
           exit 1

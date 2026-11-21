@@ -34,10 +34,15 @@ async function loadSource(src) {
   return JSON.parse(read(src));
 }
 
+// Text copied into SKILL.md: Claude Code runs !`cmd` there, so strip shell and markup metacharacters.
+const plain = (s) => String(s || "").replace(/[`$!<>\\|{}]/g, "").replace(/\s+/g, " ").trim();
+const VERSION_RE = /^[0-9][0-9A-Za-z.+-]{0,20}$/;
+const DATE_RE = /^(\d{4}-\d{2}-\d{2})?$/;
+
 function titleOf(b) {
   const first = b.content.split("\n").find((l) => l.trim()) || "";
   const m = /^#\s+(.+?)\s*$/.exec(first);
-  return (m ? m[1] : b.h2 || b.id).replace(/\s+/g, " ");
+  return plain(m ? m[1] : b.h2 || b.id);
 }
 
 function oneLine(s, max) {
@@ -60,18 +65,22 @@ export function normalize(json, coupledByCard = {}) {
     if (!ID_RE.test(id)) throw new Error(`card id not usable as a folder name: ${id}`);
     if (typeof b.content !== "string" || !b.content.trim()) throw new Error(`card ${id}: empty content`);
     const content = b.content.replace(/\r\n?/g, "\n");
+    const version = String(b.version || "0"), updatedAt = String(b.updatedAt || "");
+    if (!VERSION_RE.test(version)) throw new Error(`card ${id}: unexpected version ${JSON.stringify(version).slice(0, 40)}`);
+    if (!DATE_RE.test(updatedAt)) throw new Error(`card ${id}: unexpected updatedAt ${JSON.stringify(updatedAt).slice(0, 40)}`);
     return {
       id,
       title: titleOf(b),
-      group: group[id],
-      section: b.h2 || "",
-      version: String(b.version || "0"),
-      updatedAt: String(b.updatedAt || ""),
-      description: oneLine(b.description, 300),
+      group: plain(group[id]),
+      section: plain(b.h2),
+      version,
+      updatedAt,
+      description: oneLine(plain(b.description), 300),
       path: cardPath(id),
       rawUrl: RAW + cardPath(id),
       skill: coupledByCard[id] || null,
       sha256: sha256(content),
+      bytes: Buffer.byteLength(content),
       content,
     };
   });
@@ -243,6 +252,16 @@ export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
   }
   if (hashesDirty) fs.writeFileSync(coupled.file, JSON.stringify(hashes, null, 2) + "\n");
 
+  const review = [];
+  if (before.length) {
+    for (const id of removed) review.push(`card removed: ${id}`);
+    if (changed.length + added.length > 4) review.push(`${changed.length + added.length} cards changed in one sync`);
+    for (const id of changed) {
+      const prev = beforeById.get(id), now = cards.find((c) => c.id === id);
+      if (prev.bytes && now.bytes < prev.bytes * 0.5) review.push(`card ${id} shrank from ${prev.bytes} to ${now.bytes} bytes`);
+    }
+  }
+
   if (before.length && (added.length || removed.length || changed.length)) {
     const level = added.length || removed.length ? "minor" : "patch";
     const v = setPluginVersion(root, PLUGIN, level);
@@ -259,7 +278,7 @@ export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
     readme = replaceReadmeVersion(readme, PLUGIN, v);
   }
   if (readme !== read(p(root, "README.md"))) fs.writeFileSync(p(root, "README.md"), readme);
-  return { source, cards: cards.length, added, removed, changed, bumped, attention, wrote };
+  return { source, cards: cards.length, added, removed, changed, bumped, attention, review, wrote };
 }
 
 export function checkPrompts(root = ROOT) {
@@ -317,6 +336,7 @@ async function main() {
     for (const k of ["added", "removed", "changed"]) if (r[k].length) console.log(`  ${k}: ${r[k].join(", ")}`);
     for (const [n, v] of Object.entries(r.bumped)) console.log(`  bumped ${n} -> ${v}`);
     for (const a of r.attention) console.log(`  ATTENTION ${a}`);
+    for (const a of r.review) console.log(`  REVIEW ${a}`);
     console.log(r.wrote ? `  ${r.wrote} file(s) written` : "  no changes");
   }
 }

@@ -56,6 +56,7 @@ if command -v claude >/dev/null 2>&1 && [ "$DRY" = 0 ]; then
   INST="$CONFIG_DIR/plugins/installed_plugins.json"
   for n in $NAMES; do
     if [ -f "$INST" ] && grep -q "\"$n@$MARKET\"" "$INST"; then continue; fi
+    if [ -f "$SETTINGS" ] && grep -q "\"$n@$MARKET\": *false" "$SETTINGS"; then say "kept $n@$MARKET disabled (you turned it off before)"; continue; fi
     say "install $n@$MARKET: $(claude plugin install "$n@$MARKET" 2>&1 | tail -1)"
   done
 elif ! command -v claude >/dev/null 2>&1; then
