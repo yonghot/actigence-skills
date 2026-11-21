@@ -46,7 +46,9 @@ for n in $NAMES; do
     else mkdir -p "$CONFIG_DIR/skill-backups"; mv "$p" "$dest"; say "moved personal copy $p -> $dest (it would load twice next to the plugin)"
     fi
   fi
-  [ -e "$CONFIG_DIR/skills/synced/$n" ] && say "WARNING: $n is also synced from claude.ai (skills/synced/$n). Disable or delete that upload on claude.ai so it does not load twice."
+  if [ -e "$CONFIG_DIR/skills/synced/$n" ] || ls -d "$CONFIG_DIR"/skills/synced/*/"$n" >/dev/null 2>&1; then
+    say "WARNING: $n is also an upload synced from a claude.ai account (skills/synced). Disable that upload on claude.ai so the skill does not load twice."
+  fi
 done
 
 if command -v claude >/dev/null 2>&1 && [ "$DRY" = 0 ]; then

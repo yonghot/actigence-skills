@@ -44,7 +44,8 @@ foreach ($n in $names) {
     if ($DryRun) { Say "would move personal copy $personal -> $dest" }
     else { New-Item -ItemType Directory -Force $backupRoot | Out-Null; Move-Item $personal $dest; Say "moved personal copy $personal -> $dest (it would load twice next to the plugin)" }
   }
-  if (Test-Path (Join-Path $skillsDir "synced\$n")) { Say "WARNING: $n is also synced from claude.ai (skills\synced\$n). Disable or delete that upload on claude.ai so it does not load twice." }
+  $synced = @(Get-ChildItem -Directory -ErrorAction SilentlyContinue (Join-Path $skillsDir 'synced') | Where-Object { Test-Path (Join-Path $_.FullName $n) })
+  if ($synced.Count -or (Test-Path (Join-Path $skillsDir "synced\$n"))) { Say "WARNING: $n is also an upload synced from a claude.ai account (skills\synced). Disable that upload on claude.ai so the skill does not load twice." }
 }
 
 $offBefore = @()
@@ -97,5 +98,6 @@ if ($DryRun) { Say "would write $SettingsPath with extraKnownMarketplaces.$Marke
 New-Item -ItemType Directory -Force $ConfigDir | Out-Null
 if ($raw) { [IO.File]::WriteAllText("$SettingsPath.backup-$Stamp", $raw, (New-Object Text.UTF8Encoding $false)) }
 [IO.File]::WriteAllText($SettingsPath, $json, (New-Object Text.UTF8Encoding $false))
+if (Get-Command node -ErrorAction SilentlyContinue) { & node -e 'const fs=require("fs"),f=process.argv[1];fs.writeFileSync(f,JSON.stringify(JSON.parse(fs.readFileSync(f,"utf8")),null,2)+"\n")' $SettingsPath }
 Say "settings updated: $SettingsPath (previous copy: $SettingsPath.backup-$Stamp)"
 Say "done. Restart Claude Code. Updates are pulled automatically after the first message of each session; new plugins added to the repo later need this script again."
