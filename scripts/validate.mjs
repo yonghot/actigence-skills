@@ -213,9 +213,34 @@ export function validateSkillDir(skillDir, ctx) {
 function checkDeny(root, report, names) {
   let deny = { names: [], prefixes: [] };
   try { deny = readJson(path.join(root, "scripts", "deny-skills.json")); } catch { report.warn("scripts/deny-skills.json", "missing or unreadable"); }
-  for (const [where, n] of names) {
+  for (const [where, n, cardId] of names) {
     if (!n) continue;
-    if (deny.names.includes(n) || deny.prefixes.some((p) => n === p || n.startsWith(p))) report.error(where, `"${n}" is on the third-party deny-list`);
+    if (deny.names.includes(n) || (!cardId && deny.prefixes.some((p) => n === p || n.startsWith(p)))) report.error(where, `"${n}" is on the third-party deny-list`);
+  }
+}
+
+function checkVersions(root, report, versions) {
+  const readme = fs.readFileSync(path.join(root, "README.md"), "utf8");
+  for (const [name, v] of versions) {
+    const row = readme.match(new RegExp(`^\\| \`${name}\` \\|.*\\| ([^|]+?) \\|$`, "m"));
+    if (!row) report.warn("README.md", `no skills-table row for ${name}`);
+    else if (row[1] !== v) report.error("README.md", `${name} row says ${row[1]}, plugin.json says ${v}`);
+    const log = path.join(root, "docs", "changelog", `${name}.md`);
+    const top = fs.existsSync(log) ? fs.readFileSync(log, "utf8").match(/^## (\S+)/m) : null;
+    if (!top) report.warn(`docs/changelog/${name}.md`, "missing or has no ## <version> entry");
+    else if (top[1] !== v) report.error(`docs/changelog/${name}.md`, `newest entry is ${top[1]}, plugin.json says ${v}`);
+  }
+}
+
+function checkRalphHeaders(root, report) {
+  const lint = path.join(root, "plugins", "prd-vibecoding", "skills", "prd-vibecoding", "scripts", "lint-prd.mjs");
+  const card = path.join(root, "plugins", "oneshot-prototyping", "skills", "oneshot-prototyping", "references", "prompt.md");
+  if (!fs.existsSync(lint) || !fs.existsSync(card)) return;
+  const list = fs.readFileSync(lint, "utf8").match(/const HEADERS = \[([^\]]+)\]/);
+  if (!list) { report.error(rel(root, lint), "HEADERS list not found (the Ralph Loop contract check reads it)"); return; }
+  const lines = fs.readFileSync(card, "utf8").split("\n");
+  for (const [, h] of list[1].matchAll(/'([^']+)'/g)) {
+    if (!lines.some((l) => l.startsWith(`### ${h}`))) report.error(rel(root, card), `Ralph Loop sub-section "### ${h}" from prd-vibecoding lint-prd.mjs is missing; the PRD skill and the prototyping card no longer agree`);
   }
 }
 
@@ -310,6 +335,7 @@ export function validateRepo({ root = DEFAULT_ROOT, only = [], updateCardHashes 
   const pluginsDir = path.join(root, "plugins");
   const dirs = fs.existsSync(pluginsDir) ? fs.readdirSync(pluginsDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name) : [];
   const denyNames = [];
+  const versions = new Map();
   const promptIdx = path.join(root, "prompts", "index.json");
   const cardIds = new Set(fs.existsSync(promptIdx) ? readJson(promptIdx).cards.map((c) => c.id) : []);
   for (const [name] of entries) {
@@ -332,6 +358,7 @@ export function validateRepo({ root = DEFAULT_ROOT, only = [], updateCardHashes 
         const w = `${where}/.claude-plugin/plugin.json`;
         if (j.name !== d) report.error(w, `name "${j.name}" must equal folder "${d}"`);
         if (typeof j.version !== "string" || !SEMVER.test(j.version)) report.error(w, `version must be semver (got ${JSON.stringify(j.version)})`);
+        else versions.set(d, j.version);
         if (!j.description) report.error(w, "description missing");
         if (!j.author || j.author.name !== "ACTIGENCE") report.error(w, 'author.name must be "ACTIGENCE"');
         if (j.license !== "MIT") report.error(w, 'license must be "MIT"');
@@ -345,7 +372,7 @@ export function validateRepo({ root = DEFAULT_ROOT, only = [], updateCardHashes 
     if (!skills.length) report.error(where, "no skill folder under skills/");
     if (!skills.includes(d)) report.warn(where, `expected skills/${d}/ (plugin and skill share one name)`);
     for (const s of skills) {
-      if (!(d === PROMPTS_PLUGIN && cardIds.has(s))) denyNames.push([`${where}/skills/${s}`, s]);
+      denyNames.push([`${where}/skills/${s}`, s, d === PROMPTS_PLUGIN && cardIds.has(s)]);
       validateSkillDir(path.join(sdir, s), ctx);
     }
     for (const f of walk(pdir)) {
@@ -368,6 +395,8 @@ export function validateRepo({ root = DEFAULT_ROOT, only = [], updateCardHashes 
     checkCardHashes(root, report, updateCardHashes);
     for (const m of checkPrompts(root)) report.error("prompts", m);
     checkWrapperAnchors(root, report);
+    checkRalphHeaders(root, report);
+    checkVersions(root, report, versions);
     checkShared(root, report);
   }
   return report;

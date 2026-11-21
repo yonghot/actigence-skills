@@ -1,6 +1,6 @@
 # 프롬프트 카드
 
-ACTIGENCE 사이트([actigence.ai/vibe-coding-prompts](https://actigence.ai/vibe-coding-prompts))의 프롬프트 카드 12종입니다. 이 폴더와 `plugins/actigence-prompts` 는 사이트에서 자동으로 동기화되므로 직접 고치지 마세요(`scripts/sync-prompts.mjs`, GitHub Actions `sync-prompts`).
+ACTIGENCE 사이트([actigence.ai/vibe-coding-prompts](https://actigence.ai/vibe-coding-prompts))의 프롬프트 카드 12종입니다. 이 폴더와 `plugins/actigence-prompts` 는 사이트에서 3시간마다 자동으로 동기화되므로 직접 고치지 마세요(`scripts/sync-prompts.mjs`, GitHub Actions `sync-prompts`). 카드 삭제·대량 변경·형식 오류 같은 이상한 변경은 바로 반영하지 않고 이슈로 멈춰 사람이 확인합니다.
 
 - Claude Code: `actigence-prompts` 플러그인을 설치하면 `/actigence-prompts:<카드 id> 작업 요청` 으로 바로 씁니다. 목록은 `/actigence-prompts:actigence-prompts`.
 - 다른 도구: 아래 "원문" 링크의 내용을 그대로 복사해 붙여 넣습니다. 링크는 항상 최신판을 가리킵니다.

@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   issues: write
   actions: write
 
@@ -43,8 +42,9 @@ jobs:
         run: |
           node -e 'const r=require(process.env.RUNNER_TEMP+"/sync.json");for(const a of r.attention)console.log(a)' > "$RUNNER_TEMP/attention.txt"
           if [ -s "$RUNNER_TEMP/attention.txt" ]; then
-            title="sync-prompts: manual merge needed"
-            if ! gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number' | grep -q .; then
+            # The hash keeps one issue per distinct list: closing it silences that list until the list changes.
+            title="sync-prompts: manual merge needed ($(sha256sum "$RUNNER_TEMP/attention.txt" | cut -c1-8))"
+            if ! gh issue list --state all --search "in:title \"$title\"" --json number --jq '.[0].number' | grep -q .; then
               gh issue create --title "$title" --body "$(printf 'The prompt sync found card changes it does not apply on its own:\n\n'; sed 's/^/- /' "$RUNNER_TEMP/attention.txt")"
             fi
           fi
@@ -54,7 +54,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          { node scripts/validate.mjs && node scripts/scan.mjs && node scripts/build-zips.mjs --out "$RUNNER_TEMP/dist"; } 2>&1 | tee "$RUNNER_TEMP/check.txt"
+          { node scripts/validate.mjs && node scripts/check-bumps.mjs HEAD && node scripts/scan.mjs && node scripts/build-zips.mjs --out "$RUNNER_TEMP/dist"; } 2>&1 | tee "$RUNNER_TEMP/check.txt"
       - name: Decide whether the change can go straight to main
         id: gate
         if: steps.sync.outputs.changed == '1'
@@ -67,20 +67,31 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "sync: prompt cards from actigence.ai ($(node -e 'const r=require(process.env.RUNNER_TEMP+"/sync.json");console.log([...r.added.map(i=>"+"+i),...r.removed.map(i=>"-"+i),...r.changed].join(", ")||"metadata")'))"
+          git commit -m "sync: prompt cards from actigence.ai ($(node -e 'const r=require(process.env.RUNNER_TEMP+"/sync.json");console.log([...r.added.map(i=>"+"+i),...r.removed.map(i=>"-"+i),...r.changed,...r.meta.map(i=>i+" (info)")].join(", ")||"metadata")'))"
           git push origin HEAD:main
-      - name: Open a pull request instead (validation failed or unusual change)
+      # GITHUB_TOKEN may not open pull requests in this repo (Actions "create and approve pull requests" is off), so a held change is reported as an issue.
+      - name: Hold the change for review (validation failed or unusual change)
         if: steps.sync.outputs.changed == '1' && (steps.check.outcome != 'success' || steps.gate.outputs.direct != '1')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh pr list --state open --search "head:sync/prompts-" --json number --jq '.[0].number' | grep -q .; then echo "a sync PR is already open; not opening another"; exit 1; fi
-          branch="sync/prompts-${GITHUB_RUN_ID}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$branch"
-          git add -A
-          git commit -m "sync: prompt cards from actigence.ai (needs review)"
-          git push origin "$branch"
-          gh pr create --base main --head "$branch" --title "sync: prompt cards from actigence.ai (needs review)" --body "$(printf 'Automatic sync changed files but did not push to main.\n\nUnusual changes (deleted cards, many cards at once, a card that shrank by half):\n\n'; sed 's/^/- /' "$RUNNER_TEMP/review.txt"; printf '\n\nValidation output (tail):\n\n```\n'; tail -n 60 "$RUNNER_TEMP/check.txt" 2>/dev/null; printf '\n```\n')"
-          exit 1
+          {
+            printf 'The automatic sync found card changes but did not push them to main.\n\n'
+            printf 'Reasons (deleted or malformed cards, more than 4 cards at once, a card that shrank by half, or a failed check):\n\n'
+            sed 's/^/- /' "$RUNNER_TEMP/review.txt" 2>/dev/null
+            printf '\nFiles the sync would change:\n\n```\n'; git status --short; printf '```\n\n'
+            printf 'Check output (tail):\n\n```\n'; tail -n 60 "$RUNNER_TEMP/check.txt" 2>/dev/null; printf '\n```\n\n'
+            printf 'To apply: clone the repo, run `node scripts/sync-prompts.mjs`, review the diff, run `node scripts/validate.mjs`, then commit and push. This issue is updated on every run while the change is held.\n'
+          } > "$RUNNER_TEMP/held.md"
+          title="sync-prompts: change held for review"
+          num="$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')"
+          if [ -n "$num" ]; then gh issue edit "$num" --body-file "$RUNNER_TEMP/held.md"; else gh issue create --title "$title" --body-file "$RUNNER_TEMP/held.md"; fi
+      - name: Report a failed run
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="sync-prompts: run failed"
+          body="Run ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID} failed before it could sync (site unreachable, invalid JSON, or a script error)."
+          num="$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number')"
+          if [ -n "$num" ]; then gh issue edit "$num" --body "$body"; else gh issue create --title "$title" --body "$body"; fi

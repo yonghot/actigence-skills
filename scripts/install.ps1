@@ -7,7 +7,8 @@ $Here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Source = Split-Path -Parent $Here
 $HomeDir = $env:USERPROFILE
 if (-not $HomeDir) { $HomeDir = $HOME }
-$Target = Join-Path (Join-Path $HomeDir '.claude') 'skills'
+$ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HomeDir '.claude' }
+$Target = Join-Path $ClaudeDir 'skills'
 $Action = 'install'
 $Dry = $false
 $All = $false
@@ -53,7 +54,7 @@ while ($i -lt $args.Count) {
 }
 
 $BackupRoot = Join-Path (Split-Path -Parent $Target) 'skill-backups'
-$PluginsJson = Join-Path (Join-Path (Join-Path $HomeDir '.claude') 'plugins') 'installed_plugins.json'
+$PluginsJson = Join-Path (Join-Path $ClaudeDir 'plugins') 'installed_plugins.json'
 
 function Get-AvailableSkills {
     $found = @()

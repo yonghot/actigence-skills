@@ -53,22 +53,30 @@ function oneLine(s, max) {
   return (dot > max * 0.5 ? cut.slice(0, dot + 1) : cut).trim() + "…";
 }
 
-export function normalize(json, coupledByCard = {}) {
+export function normalize(json, coupledByCard = {}, skipped = null) {
   if (!json || !Array.isArray(json.blocks) || !Array.isArray(json.tree)) throw new Error("source: expected {blocks[], tree[]}");
   const byId = new Map(json.blocks.map((b) => [b.id, b]));
   const order = [];
   const group = {};
   for (const t of json.tree) for (const h of t.h2_groups || []) for (const id of h.blocks || []) if (byId.has(id) && !group[id]) { group[id] = t.title; order.push(id); }
   for (const b of json.blocks) if (!group[b.id]) { group[b.id] = b.h1 || "기타"; order.push(b.id); }
-  return order.map((id) => {
+  const out = [];
+  for (const id of order) {
     const b = byId.get(id);
-    if (!ID_RE.test(id)) throw new Error(`card id not usable as a folder name: ${id}`);
-    if (typeof b.content !== "string" || !b.content.trim()) throw new Error(`card ${id}: empty content`);
-    const content = b.content.replace(/\r\n?/g, "\n");
     const version = String(b.version || "0"), updatedAt = String(b.updatedAt || "");
-    if (!VERSION_RE.test(version)) throw new Error(`card ${id}: unexpected version ${JSON.stringify(version).slice(0, 40)}`);
-    if (!DATE_RE.test(updatedAt)) throw new Error(`card ${id}: unexpected updatedAt ${JSON.stringify(updatedAt).slice(0, 40)}`);
-    return {
+    const problem = !ID_RE.test(String(id)) ? `card id not usable as a folder name: ${JSON.stringify(String(id)).slice(0, 40)}`
+      : id === PLUGIN ? `card id ${id} collides with the index skill name`
+      : typeof b.content !== "string" || !b.content.trim() ? `card ${id}: empty content`
+      : !VERSION_RE.test(version) ? `card ${id}: unexpected version ${JSON.stringify(version).slice(0, 40)}`
+      : !DATE_RE.test(updatedAt) ? `card ${id}: unexpected updatedAt ${JSON.stringify(updatedAt).slice(0, 40)}`
+      : null;
+    if (problem) {
+      if (!skipped) throw new Error(problem);
+      skipped.push({ id: String(id), problem });
+      continue;
+    }
+    const content = b.content.replace(/\r\n?/g, "\n");
+    out.push({
       id,
       title: titleOf(b),
       group: plain(group[id]),
@@ -82,8 +90,9 @@ export function normalize(json, coupledByCard = {}) {
       sha256: sha256(content),
       bytes: Buffer.byteLength(content),
       content,
-    };
-  });
+    });
+  }
+  return out;
 }
 
 export function cardSkillMd(c) {
@@ -129,7 +138,7 @@ export function catalogMd(cards) {
   const rows = cards.map((c) => `| ${c.group}${c.section ? ` · ${c.section}` : ""} | \`${c.id}\` | ${c.title} | ${c.version} | ${c.updatedAt} | [보기](${BLOB}${c.path}) · [원문](${c.rawUrl}) | ${c.skill ? `[${c.skill}](../plugins/${c.skill})` : "-"} |`).join("\n");
   return `# 프롬프트 카드
 
-ACTIGENCE 사이트([actigence.ai/vibe-coding-prompts](https://actigence.ai/vibe-coding-prompts))의 프롬프트 카드 ${cards.length}종입니다. 이 폴더와 \`plugins/${PLUGIN}\` 는 사이트에서 자동으로 동기화되므로 직접 고치지 마세요(\`scripts/sync-prompts.mjs\`, GitHub Actions \`sync-prompts\`).
+ACTIGENCE 사이트([actigence.ai/vibe-coding-prompts](https://actigence.ai/vibe-coding-prompts))의 프롬프트 카드 ${cards.length}종입니다. 이 폴더와 \`plugins/${PLUGIN}\` 는 사이트에서 3시간마다 자동으로 동기화되므로 직접 고치지 마세요(\`scripts/sync-prompts.mjs\`, GitHub Actions \`sync-prompts\`). 카드 삭제·대량 변경·형식 오류 같은 이상한 변경은 바로 반영하지 않고 이슈로 멈춰 사람이 확인합니다.
 
 - Claude Code: \`${PLUGIN}\` 플러그인을 설치하면 \`/${PLUGIN}:<카드 id> 작업 요청\` 으로 바로 씁니다. 목록은 \`/${PLUGIN}:${PLUGIN}\`.
 - 다른 도구: 아래 "원문" 링크의 내용을 그대로 복사해 붙여 넣습니다. 링크는 항상 최신판을 가리킵니다.
@@ -155,6 +164,8 @@ function loadCoupled(root) {
   for (const [skill, e] of Object.entries(data.skills || {})) if (e.card) byCard[e.card] = skill;
   return { file: f, data, byCard };
 }
+
+const escapeRe = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 function replaceReadmeVersion(readme, name, version) {
   return readme.replace(new RegExp(`^(\\| \`${name}\` \\|.*\\| )([0-9]+\\.[0-9]+\\.[0-9]+)( \\|)$`, "m"), `$1${version}$3`);
@@ -195,27 +206,32 @@ function skillDirsOnDisk(root) {
 
 export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
   const coupled = loadCoupled(root);
-  const cards = normalize(await loadSource(source), coupled.byCard);
+  const skipped = [];
+  const cards = normalize(await loadSource(source), coupled.byCard, skipped);
   const before = exists(p(root, "prompts", "index.json")) ? JSON.parse(read(p(root, "prompts", "index.json"))).cards : [];
   const beforeById = new Map(before.map((c) => [c.id, c]));
-  const nowIds = new Set(cards.map((c) => c.id));
-  const changed = [], added = [], removed = [], attention = [], bumped = {};
+  const nowIds = new Set([...cards.map((c) => c.id), ...skipped.map((s) => s.id)]);
+  const changed = [], meta = [], added = [], removed = [], bumped = {};
+  const attention = skipped.map((s) => `skipped a malformed card on the site: ${s.problem}`);
+  const META_KEYS = ["title", "group", "section", "description", "updatedAt"];
 
   for (const c of cards) {
     const prev = beforeById.get(c.id);
     if (!prev) added.push(c.id);
     else if (prev.sha256 !== c.sha256 || prev.version !== c.version) changed.push(c.id);
+    else if (META_KEYS.some((k) => (prev[k] ?? "") !== c[k])) meta.push(c.id);
   }
   for (const id of skillDirsOnDisk(root)) if (id !== PLUGIN && !nowIds.has(id)) removed.push(id);
 
   const files = planWrite(root, cards, source);
-  let wrote = 0;
+  let wrote = 0, pluginWrites = 0;
   for (const [rel, text] of files) {
     const f = p(root, rel);
     if (exists(f) && read(f) === text) continue;
     fs.mkdirSync(path.dirname(f), { recursive: true });
     fs.writeFileSync(f, text);
     wrote++;
+    if (rel.startsWith(`plugins/${PLUGIN}/`)) pluginWrites++;
   }
   for (const id of removed) { fs.rmSync(p(root, "plugins", PLUGIN, "skills", id), { recursive: true, force: true }); wrote++; }
 
@@ -240,12 +256,14 @@ export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
     bumped[skill] = v;
     prependChangelog(root, skill, v, [`카드 \`${card.id}\` v${card.version}(${card.updatedAt}) 원문으로 \`references/prompt.md\` 를 자동 동기화했다(이전 v${oldVersion}).`]);
     readme = replaceReadmeVersion(readme, skill, v);
+    const ov = escapeRe(oldVersion);
     for (const rel of [`plugins/${skill}/skills/${skill}/SKILL.md`, "docs/card-coupling.md", "README.md"]) {
       const f = p(root, rel);
       const cur = rel === "README.md" ? readme : read(f);
-      const next = cur.split(`\`${card.id}\` v${oldVersion}`).join(`\`${card.id}\` v${card.version}`)
-        .replace(new RegExp(`(\\| ${skill} \\| ${card.id} \\| )${oldVersion.replace(/\./g, "\\.")}( \\|)`), `$1${card.version}$2`)
-        .replace(new RegExp(`(${card.id} v)${oldVersion.replace(/\./g, "\\.")}( \\(exact\\))`), `$1${card.version}$2`);
+      let next = cur.split(`\`${card.id}\` v${oldVersion}`).join(`\`${card.id}\` v${card.version}`)
+        .replace(new RegExp(`(\\| ${skill} \\| ${card.id} \\| )${ov}( \\|)`), `$1${card.version}$2`)
+        .replace(new RegExp(`(${card.id} v)${ov}( \\(exact\\))`), `$1${card.version}$2`);
+      if (rel.endsWith("SKILL.md")) next = next.replace(new RegExp(`^(# .*? v)${ov}( \\(\\d{4}-\\d{2}-\\d{2}\\))?$`, "m"), (_, a, d) => `${a}${card.version}${d && card.updatedAt ? ` (${card.updatedAt})` : d || ""}`);
       if (rel === "README.md") readme = next; else if (next !== cur) fs.writeFileSync(f, next);
     }
     wrote++;
@@ -255,6 +273,7 @@ export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
   const review = [];
   if (before.length) {
     for (const id of removed) review.push(`card removed: ${id}`);
+    for (const s of skipped) if (beforeById.has(s.id)) review.push(`existing card skipped as malformed: ${s.problem}`);
     if (changed.length + added.length > 4) review.push(`${changed.length + added.length} cards changed in one sync`);
     for (const id of changed) {
       const prev = beforeById.get(id), now = cards.find((c) => c.id === id);
@@ -262,7 +281,7 @@ export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
     }
   }
 
-  if (before.length && (added.length || removed.length || changed.length)) {
+  if (before.length && (added.length || removed.length || changed.length || meta.length || pluginWrites)) {
     const level = added.length || removed.length ? "minor" : "patch";
     const v = setPluginVersion(root, PLUGIN, level);
     bumped[PLUGIN] = v;
@@ -273,12 +292,14 @@ export async function sync({ root = ROOT, source = DEFAULT_SOURCE } = {}) {
         const c = cards.find((x) => x.id === id), pv = beforeById.get(id).version;
         return pv === c.version ? `카드 본문 갱신: \`${id}\` v${c.version}` : `카드 갱신: \`${id}\` v${pv} → v${c.version}(${c.updatedAt})`;
       }),
+      ...meta.map((id) => `카드 정보(제목·분류·설명·날짜) 갱신: \`${id}\``),
     ];
+    if (!lines.length) lines.push("카드 목록·명령 파일 갱신");
     prependChangelog(root, PLUGIN, v, lines.map((l) => `${l} (자동 동기화)`));
     readme = replaceReadmeVersion(readme, PLUGIN, v);
   }
   if (readme !== read(p(root, "README.md"))) fs.writeFileSync(p(root, "README.md"), readme);
-  return { source, cards: cards.length, added, removed, changed, bumped, attention, review, wrote };
+  return { source, cards: cards.length, added, removed, changed, meta, bumped, attention, review, wrote };
 }
 
 export function checkPrompts(root = ROOT) {
@@ -333,7 +354,7 @@ async function main() {
   if (json) console.log(JSON.stringify(r));
   else {
     console.log(`sync-prompts: ${r.cards} cards from ${r.source}`);
-    for (const k of ["added", "removed", "changed"]) if (r[k].length) console.log(`  ${k}: ${r[k].join(", ")}`);
+    for (const k of ["added", "removed", "changed", "meta"]) if (r[k].length) console.log(`  ${k}: ${r[k].join(", ")}`);
     for (const [n, v] of Object.entries(r.bumped)) console.log(`  bumped ${n} -> ${v}`);
     for (const a of r.attention) console.log(`  ATTENTION ${a}`);
     for (const a of r.review) console.log(`  REVIEW ${a}`);

@@ -18,11 +18,13 @@ curl -fsSL https://raw.githubusercontent.com/yonghot/actigence-skills/main/scrip
 
 하는 일:
 
-1. 같은 이름의 개인 복사본(`~/.claude/skills/<이름>`)을 `~/.claude/skill-backups/<이름>-<시각>/` 으로 옮깁니다(`-KeepPersonalCopies` / `--keep-personal-copies` 로 끔). claude.ai 에서 동기화된 사본(`skills/synced/<이름>`)이 있으면 경고만 합니다.
-2. `claude` 명령이 있으면 마켓플레이스를 추가하고 설치되지 않은 플러그인을 설치합니다. 없으면 다음 세션 시작 때 Claude Code 가 설정을 보고 내려받습니다.
-3. `~/.claude/settings.json`(또는 `CLAUDE_CONFIG_DIR`)에 `extraKnownMarketplaces.actigence-skills` 를 `autoUpdate: true` 로 넣고 플러그인을 `enabledPlugins` 에 켭니다. 전에 직접 끈 플러그인은 그대로 둡니다. 원래 파일은 `settings.json.backup-<시각>` 으로 남깁니다.
+1. `claude` 명령이 있으면 마켓플레이스를 추가하고(처음일 때만) 설치되지 않은 플러그인을 설치합니다. 없으면 다음 세션 시작 때 Claude Code 가 설정을 보고 내려받습니다. `claude` 가 실패해도 다음 단계는 계속합니다.
+2. `~/.claude/settings.json`(또는 `CLAUDE_CONFIG_DIR`)에 `extraKnownMarketplaces.actigence-skills` 를 `autoUpdate: true` 로 넣고 플러그인을 `enabledPlugins` 에 켭니다. 전에 직접 끈 플러그인은 그대로 둡니다. 내용이 바뀔 때만 쓰고, 그때 원래 파일을 `settings.json.backup-<시각>` 으로 남깁니다. `plugins/known_marketplaces.json` 에도 같은 자동 업데이트 표시를 켭니다(`/plugin` 의 자동 업데이트 토글이 쓰는 곳).
+3. 같은 이름의 개인 복사본(`~/.claude/skills/<이름>`)을 `~/.claude/skill-backups/<이름>-<시각>/` 으로 옮깁니다(`-KeepPersonalCopies` / `--keep-personal-copies` 로 끔). claude.ai 에서 동기화된 사본(`skills/synced/<계정 폴더>/<이름>`)이 있으면 경고만 합니다.
 
-자동 업데이트는 대화형 세션에서 첫 메시지를 보낸 뒤 최대 10분 안에 돌고, 받은 새 판은 다음 실행(또는 `/reload-plugins`)부터 적용됩니다. `DISABLE_AUTOUPDATER`·`DISABLE_UPDATES`·`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 를 켠 환경에서는 돌지 않습니다(`FORCE_AUTOUPDATE_PLUGINS=1` 로 되살림). 저장소에 새 플러그인이 추가되면 스크립트를 한 번 더 실행해야 켜집니다. 새 프롬프트 카드는 `actigence-prompts` 안에 들어오므로 다시 실행할 필요가 없습니다.
+자동 업데이트는 대화형 세션에서 첫 메시지를 보낸 뒤 최대 10분 안에 돌고, 받은 새 판은 다음 실행(또는 `/reload-plugins`)부터 적용됩니다. `DISABLE_AUTOUPDATER`·`DISABLE_UPDATES`·`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 를 켠 환경에서는 돌지 않습니다(`FORCE_AUTOUPDATE_PLUGINS=1` 로 되살림). 저장소에 새 플러그인이 추가되면 스크립트를 한 번 더 실행해야 켜집니다. 새 프롬프트 카드는 `actigence-prompts` 안에 들어오므로 다시 실행할 필요가 없습니다. `claude plugin marketplace add yonghot/actigence-skills` 를 손으로 다시 실행하면 settings.json 의 `autoUpdate` 가 지워지니(2026-11-22 실측) 그 뒤에는 스크립트를 다시 실행하세요.
+
+npm 으로 설치한 `claude` 가 `claude.ps1` 로 잡혀 실행 정책 때문에 막히는 PC 에서는 스크립트가 `claude.exe`·`claude.cmd` 를 찾아 씁니다. 파일로 받은 스크립트를 실행할 때는 `powershell -ExecutionPolicy Bypass -File scripts\setup-claude-code.ps1` 처럼 실행합니다.
 
 ## 1. Claude Code 플러그인 마켓플레이스
 
@@ -60,13 +62,14 @@ claude plugin update gmp@actigence-skills
 
 ## 2. claude.ai·데스크톱 앱
 
-1. [Releases](https://github.com/yonghot/actigence-skills/releases) 에서 `<스킬이름>-<버전>.zip` 을 받습니다. zip 최상위는 스킬 이름과 같은 폴더입니다.
+1. [Releases](https://github.com/yonghot/actigence-skills/releases) 에서 `<스킬이름>-<버전>.zip` 을 받습니다. zip 최상위는 스킬 이름과 같은 폴더입니다. 프롬프트 카드는 스킬 zip 이 아니라 `actigence-prompt-cards-<버전>.zip`(카드별 `.md` 와 `index.json`)으로 따로 들어 있습니다.
 2. Customize > Skills 에서 Upload a skill 로 올립니다. 코드 실행과 파일 생성 기능이 켜져 있어야 합니다.
 3. 이 업로드 경로는 공개 후 시험 전이라 확인되지 않았습니다. 웹 업로드는 SKILL.md 앞부분에 `name` 과 `description` 외의 키가 있으면 오류가 납니다. 이 저장소의 스킬은 그 두 키만 씁니다.
 
 참고
 
-- 같은 계정으로 로그인한 Claude Code 는 올린 스킬을 `~/.claude/skills/synced/` 로 동기화합니다. 이 스킬을 플러그인으로 또 설치하지 마세요.
+- 같은 계정으로 로그인한 Claude Code 는 올린 스킬을 `~/.claude/skills/synced/<계정 폴더>/` 로 동기화합니다(관찰). 이 스킬을 플러그인으로 또 설치하지 마세요.
+- 올린 zip 은 저절로 새 판으로 바뀌지 않습니다. Claude Code 와 함께 쓴다면 claude.ai 쪽 업로드는 끄고 0번 스크립트의 플러그인만 쓰는 편이 늘 최신입니다.
 - Customize 의 Add marketplace 화면에 저장소 주소를 넣는 방법은 확인되지 않았습니다(unverified). 동작하면 편하지만, 확실한 경로는 zip 업로드입니다.
 
 ## 3. 수동 설치 스크립트
@@ -92,7 +95,7 @@ powershell -ExecutionPolicy Bypass -File scripts\install.ps1 --skills gmp,factch
 | --- | --- |
 | `--list` | 사용 가능한 스킬과, 각각이 개인 폴더·synced·플러그인 중 어디에 이미 있는지 표시 |
 | `--all` / `--skills a,b` | 설치 대상 |
-| `--target DIR` | 설치할 스킬 폴더. 기본은 `~/.claude/skills` (Windows 는 `%USERPROFILE%\.claude\skills`) |
+| `--target DIR` | 설치할 스킬 폴더. 기본은 `CLAUDE_CONFIG_DIR` 이 있으면 그 아래 `skills`, 없으면 `~/.claude/skills` (Windows 는 `%USERPROFILE%\.claude\skills`) |
 | `--source DIR` | 저장소 루트 또는 풀어 둔 스킬 폴더 모음 |
 | `--uninstall` | 이 스크립트의 표식 파일(`.installed-by-actigence-skills`)이 있는 폴더만 삭제 |
 | `--dry-run` | 실행하지 않고 계획만 출력 |

@@ -18,11 +18,18 @@ macOS·Linux·Git Bash:
 curl -fsSL https://raw.githubusercontent.com/yonghot/actigence-skills/main/scripts/setup-claude-code.sh | bash
 ```
 
-이 스크립트는 마켓플레이스를 추가하고 자동 업데이트를 켠 뒤(`extraKnownMarketplaces.actigence-skills.autoUpdate`) 모든 플러그인을 설치·활성화합니다. 같은 이름의 개인 복사본(`~/.claude/skills/<이름>`)은 두 번 로드되지 않게 `~/.claude/skill-backups/` 로 옮깁니다. 그 뒤로는 Claude Code 세션에서 첫 메시지를 보내면 새 판을 자동으로 받고, 다음 실행부터 적용됩니다. 일부만 원하면 `-Skills gmp,factcheck`(PowerShell) 또는 `--skills gmp,factcheck`(bash) 를 붙입니다.
+이 스크립트는 마켓플레이스를 추가하고 자동 업데이트를 켠 뒤(`extraKnownMarketplaces.actigence-skills.autoUpdate` 와 PC별 `plugins/known_marketplaces.json`) 모든 플러그인을 설치·활성화합니다. 같은 이름의 개인 복사본(`~/.claude/skills/<이름>`)은 두 번 로드되지 않게 `~/.claude/skill-backups/` 로 옮깁니다. 다시 실행해도 바뀐 것이 없으면 아무것도 쓰지 않습니다. 그 뒤로는 대화형 Claude Code 세션에서 첫 메시지를 보내고 최대 10분 안에 새 판을 받고, 다음 실행(또는 `/reload-plugins`)부터 적용됩니다. 일부만 설치하는 명령은 [docs/INSTALL.md](docs/INSTALL.md) 0번에 있습니다(한 줄 명령 뒤에 옵션을 그냥 붙이면 동작하지 않습니다).
+
+자동으로 되지 않는 것:
+
+- 저장소에 새 플러그인이 추가된 경우: 스크립트를 한 번 더 실행해야 켜집니다(새 프롬프트 카드는 `actigence-prompts` 안에 들어오므로 해당 없음).
+- `claude plugin marketplace add yonghot/actigence-skills` 를 손으로 다시 실행한 경우: settings.json 의 `autoUpdate` 가 지워집니다(2026-11-22 실측). 스크립트를 다시 실행하세요.
+- `claude -p` 같은 비대화형 실행, `DISABLE_AUTOUPDATER`·`DISABLE_UPDATES`·`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 를 켠 환경.
+- claude.ai·데스크톱 zip 업로드와 수동 복사본.
 
 ## 프롬프트 카드
 
-ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.md) 에 있습니다. GitHub Actions(`sync-prompts`)가 3시간마다 사이트에서 카드를 받아 오고, 바뀐 카드가 있으면 버전을 올려 커밋합니다. 그래서 자동 업데이트를 켠 PC 는 늘 사이트와 같은 카드를 씁니다.
+ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.md) 에 있습니다. GitHub Actions(`sync-prompts`)가 3시간마다 사이트에서 카드를 받아 오고, 바뀐 카드가 있으면(본문·버전·제목·분류·설명·날짜 무엇이든) 플러그인 버전을 올려 커밋합니다. 그래서 자동 업데이트를 켠 PC 는 보통 몇 시간 안에 사이트 카드를 따라갑니다. 카드 삭제, 한 번에 5장 이상 변경, 절반 넘게 줄어든 카드, 형식이 깨진 카드, 검증 실패는 바로 반영하지 않고 "sync-prompts: change held for review" 이슈로 멈춰 사람이 확인합니다.
 
 - Claude Code: `actigence-prompts` 플러그인의 `/actigence-prompts:<카드 id> 작업 요청`. 목록은 `/actigence-prompts:actigence-prompts`. 자동으로 발동하지 않고 명령으로만 씁니다.
 - 그 밖의 도구·계정: [prompts/README.md](prompts/README.md) 표의 "원문" 링크(항상 최신판)를 복사해 붙여 넣습니다.
@@ -68,7 +75,7 @@ ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.m
 
    그다음 `/plugin` → Marketplaces → `actigence-skills` 에서 자동 업데이트를 켭니다(제3자 마켓플레이스는 기본이 꺼짐).
 
-2. claude.ai·데스크톱 앱: [Releases](https://github.com/yonghot/actigence-skills/releases) 에서 스킬별 zip(`<스킬이름>-<버전>.zip`)을 받아 Customize > Skills 에서 업로드합니다. 마켓플레이스 추가 화면으로 설치하는 경로와 GitHub 저장소 약칭(`yonghot/actigence-skills`)으로 추가하는 경로, claude.ai zip 업로드는 공개 후 시험 전이라 확인되지 않았습니다.
+2. claude.ai·데스크톱 앱: [Releases](https://github.com/yonghot/actigence-skills/releases) 에서 스킬별 zip(`<스킬이름>-<버전>.zip`)을 받아 Customize > Skills 에서 업로드합니다. 프롬프트 카드는 스킬이 아니라 `actigence-prompt-cards-<버전>.zip`(카드별 `.md` + `index.json`) 한 묶음입니다. 올린 zip 은 새 판이 나와도 바뀌지 않으니 릴리스가 나오면 다시 올리세요. 마켓플레이스 추가 화면으로 설치하는 경로와 GitHub 저장소 약칭(`yonghot/actigence-skills`)으로 추가하는 경로, claude.ai zip 업로드는 공개 후 시험 전이라 확인되지 않았습니다.
 
 3. 수동 설치: 저장소를 받은 뒤 `bash scripts/install.sh --all` 또는 `powershell -ExecutionPolicy Bypass -File scripts\install.ps1 --all` 을 실행합니다. `--list` 로 이미 설치된 상태를 먼저 볼 수 있습니다.
 
@@ -76,8 +83,8 @@ ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.m
 
 같은 스킬이 두 경로로 설치되면 설명이 두 번 로드되어 같은 요청에 두 번 반응할 수 있습니다.
 
-- 플러그인으로 설치한 스킬은 개인 폴더(`~/.claude/skills/<이름>`)에 같은 이름의 복사본이 있어도 둘 다 로드됩니다. 플러그인 설치 후 개인 복사본은 지우세요.
-- claude.ai 에 올린 스킬은 같은 계정의 Claude Code 에 `~/.claude/skills/synced/` 로 동기화됩니다. 같은 스킬을 플러그인으로 또 설치하지 마세요.
+- 플러그인으로 설치한 스킬은 개인 폴더(`~/.claude/skills/<이름>`)에 같은 이름의 복사본이 있어도 둘 다 스킬 목록에 올라옵니다(한 PC 에서 관찰, 공식 문서에 명시된 동작은 아님). 플러그인 설치 후 개인 복사본은 지우세요.
+- claude.ai 에 올린 스킬은 같은 계정으로 로그인한 Claude Code 에 `~/.claude/skills/synced/<계정 폴더>/<이름>` 으로 동기화됩니다(관찰). 같은 스킬을 플러그인으로 쓰려면 claude.ai 쪽 업로드를 끄세요.
 - 설치 스크립트는 `synced/` 복사본과 플러그인 설치본을 찾으면 경고하고 건너뜁니다(`--force` 로 무시 가능).
 - 같은 이름의 폴더가 이미 있으면 스킬 폴더 밖의 `~/.claude/skill-backups/<이름>-<시각>/` 으로 옮긴 뒤 설치합니다. 이 스크립트가 설치한 폴더에는 `.installed-by-actigence-skills` 표식 파일이 들어가며, `--uninstall` 은 표식이 있는 폴더만 지웁니다.
 
@@ -98,6 +105,7 @@ ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.m
 ## 버전
 
 - 버전의 단일 출처는 각 `plugins/<이름>/.claude-plugin/plugin.json` 의 `version`(semver)입니다. SKILL.md 앞부분에는 `name` 과 `description` 만 둡니다.
+- Claude Code 는 버전이 바뀐 플러그인만 다시 받습니다. 스킬 파일을 고치면 같은 커밋에서 `plugin.json` 버전을 올리고 `docs/changelog/<이름>.md` 맨 위에 그 버전을 적고 README 표의 버전 칸을 맞추세요. 버전을 안 올린 수정은 어느 PC 에도 전달되지 않으므로 CI(`scripts/check-bumps.mjs`)가 실패시키고, 세 곳의 버전이 어긋나면 `validate.mjs` 가 실패시킵니다.
 - 스킬별 변경 내역은 `docs/changelog/<이름>.md` 에 있습니다.
 - 릴리스 태그는 `vYYYY.MM.DD` 이고, 태그가 올라가면 CI 가 스킬별 zip 을 빌드해 릴리스에 첨부합니다.
 - 프롬프트 카드와 짝을 이루는 스킬은 `docs/card-hashes.json` 으로 `references/prompt.md` 의 변경을 감시합니다. 카드보다 앞선 사본은 `ahead-of-card` 로 표시됩니다.
@@ -106,6 +114,7 @@ ACTIGENCE 사이트의 프롬프트 카드 전부가 [prompts/](prompts/README.m
 
 ```
 node scripts/validate.mjs
+node scripts/check-bumps.mjs origin/main
 node scripts/scan.mjs
 node scripts/build-zips.mjs
 ```

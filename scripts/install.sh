@@ -6,7 +6,8 @@ MARKER=".installed-by-actigence-skills"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SOURCE="$(dirname "$HERE")"
 HOME_DIR="${HOME:-$USERPROFILE}"
-TARGET="$HOME_DIR/.claude/skills"
+CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME_DIR/.claude}"
+TARGET="$CLAUDE_DIR/skills"
 ACTION="install"
 DRY=0
 ALL=0
@@ -48,7 +49,7 @@ while [ $# -gt 0 ]; do
 done
 
 BACKUP_ROOT="$(dirname "$TARGET")/skill-backups"
-PLUGINS_JSON="$HOME_DIR/.claude/plugins/installed_plugins.json"
+PLUGINS_JSON="$CLAUDE_DIR/plugins/installed_plugins.json"
 
 # prints "name<TAB>path" for each skill found in SOURCE
 enumerate() {
